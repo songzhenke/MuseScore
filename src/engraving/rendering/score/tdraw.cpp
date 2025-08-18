@@ -48,6 +48,7 @@
 #include "dom/capo.h"
 
 #include "dom/deadslapped.h"
+#include "dom/durationline.h"
 #include "dom/dynamic.h"
 
 #include "dom/expression.h"
@@ -94,6 +95,7 @@
 #include "dom/notedot.h"
 #include "dom/noteline.h"
 
+#include "dom/octavedot.h"
 #include "dom/ornament.h"
 #include "dom/ottava.h"
 
@@ -215,6 +217,8 @@ void TDraw::drawItem(const EngravingItem* item, Painter* painter)
 
     case ElementType::DEAD_SLAPPED: draw(item_cast<const DeadSlapped*>(item), painter);
         break;
+    case ElementType::DURATION_LINE: draw(item_cast<const DurationLine*>(item), painter);
+        break;
     case ElementType::DYNAMIC:      draw(item_cast<const Dynamic*>(item), painter);
         break;
 
@@ -307,6 +311,8 @@ void TDraw::drawItem(const EngravingItem* item, Painter* painter)
     case ElementType::NOTELINE_SEGMENT: draw(item_cast<const NoteLineSegment*>(item), painter);
         break;
 
+    case ElementType::OCTAVE_DOT:   draw(item_cast<const OctaveDot*>(item), painter);
+        break;
     case ElementType::ORNAMENT:     draw(item_cast<const Ornament*>(item), painter);
         break;
     case ElementType::OTTAVA_SEGMENT:       draw(item_cast<const OttavaSegment*>(item), painter);
@@ -1170,6 +1176,15 @@ void TDraw::draw(const DeadSlapped* item, Painter* painter)
 void TDraw::draw(const Dynamic* item, Painter* painter)
 {
     drawTextBase(item, painter);
+}
+
+void TDraw::draw(const DurationLine* item, Painter* painter)
+{
+    TRACE_DRAW_ITEM;
+
+    const DurationLine::LayoutData* ldata = item->ldata();
+    painter->setPen(Pen(item->curColor(), ldata->lineWidth, PenStyle::SolidLine, PenCapStyle::FlatCap));
+    painter->drawLine(LineF(0.0, 0.0, item->len(), 0.0));
 }
 
 void TDraw::draw(const Expression* item, Painter* painter)
@@ -2199,7 +2214,8 @@ void TDraw::draw(const Note* item, Painter* painter)
 
     Color c(negativeFret ? config->criticalColor() : item->curColor());
     painter->setPen(c);
-    bool tablature = item->staff() && item->staff()->isTabStaff(item->chord()->tick());
+    bool tablature = item->staff() && item->staff()->isTabStaff(item->tick());
+    bool jianpu = item->staff() && item->staff()->isJianpuStaff(item->tick());
 
     // tablature
     if (tablature) {
@@ -2227,6 +2243,22 @@ void TDraw::draw(const Note* item, Painter* painter)
         painter->drawText(PointF(startPosX, yOffset * item->magS()), item->fretString());
     }
     // NOT tablature
+    else if (jianpu) {
+        const Staff* staff = item->staff();
+        const StaffType* staffType = staff->staffTypeForElement(item);
+
+        Font f(staffType->jianpuFont());
+        const double mag = item->magS() * MScore::pixelRatio;
+        f.setPointSizeF(f.pointSizeF() * mag);
+        painter->setFont(f);
+        painter->setPen(c);
+
+        FontMetrics fm(f);
+        const double fw = fm.width(item->jianpuDigit()) / mag;
+        const double bw = ldata->bbox().width();
+        const double startPosX = ldata->bbox().x() + (bw - fw) * .5;
+        painter->drawText(PointF(startPosX, 0), item->jianpuDigit());
+    }
     else {
         // skip drawing, if second note of a cross-measure value
         if (item->chord() && item->chord()->crossMeasure() == CrossMeasure::SECOND) {
@@ -2293,6 +2325,18 @@ void TDraw::draw(const NoteLineSegment* item, Painter* painter)
 {
     TRACE_DRAW_ITEM;
     drawTextLineBaseSegment(item, painter);
+}
+
+void TDraw::draw(const OctaveDot* item, Painter* painter)
+{
+    TRACE_DRAW_ITEM;
+
+    double rad = item->ldata()->radius;
+    double x = item->len() * 0.5; // draw dot in the middle
+
+    painter->setPen(Pen(item->curColor()));
+    painter->setBrush(Brush(item->curColor()));
+    painter->drawEllipse(PointF(x, 0), rad, rad);
 }
 
 void TDraw::draw(const OttavaSegment* item, Painter* painter)
@@ -2452,6 +2496,20 @@ void TDraw::draw(const Rest* item, Painter* painter)
 
     painter->setPen(item->curColor());
 
+    bool jianpu = item->staff() && item->staff()->isJianpuStaff(item->tick());
+    if (jianpu) {
+        const Staff* staff = item->staff();
+        const StaffType* staffType = staff->staffTypeForElement(item);
+
+        Font f(staffType->jianpuFont());
+        f.setPointSizeF(f.pointSizeF() * item->magS() * MScore::pixelRatio);
+        painter->setFont(f);
+        painter->setPen(item->curColor());
+        double startPosX = ldata->bbox().x();
+        painter->drawText(PointF(startPosX, 0), String(u"0"));
+        return;
+    }
+    
     if (DeadSlapped* ds = item->deadSlapped()) {
         draw(ds, painter);
     } else {

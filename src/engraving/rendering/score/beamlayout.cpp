@@ -854,6 +854,14 @@ void BeamLayout::layoutNonCrossBeams(ChordRest* cr, LayoutContext& ctx)
         return;
     }
 
+    if (Chord* chord = toChord(cr); chord) {
+        staff_idx_t idx = chord->staffIdx() + chord->staffMove();
+        const Staff* st = ctx.dom().staff(idx);
+        if (st->isJianpuStaff(chord->tick())) {
+            return;
+        }
+    }
+
     Beam* beam = cr->beam();
 
     TLayout::layoutBeam(beam, ctx);
