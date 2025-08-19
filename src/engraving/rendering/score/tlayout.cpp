@@ -369,7 +369,7 @@ void TLayout::layoutItem(EngravingItem* item, LayoutContext& ctx)
     case ElementType::ORNAMENT:
         layoutOrnament(item_cast<const Ornament*>(item), static_cast<Ornament::LayoutData*>(ldata), ctx.conf());
         break;
-    case ElementType::OCTAVE_DOT:       layoutOctaveDot(item_cast<OctaveDot*>(item), ctx);
+    case ElementType::OCTAVE_DOT:       layoutOctaveDot(item_cast<OctaveDot*>(item));
         break;
     case ElementType::OTTAVA:           layoutOttava(item_cast<Ottava*>(item), ctx);
         break;
@@ -4465,7 +4465,7 @@ void TLayout::layoutNoteDot(const NoteDot* item, NoteDot::LayoutData* ldata)
     ldata->setBbox(item->symBbox(SymId::augmentationDot));
 }
 
-void TLayout::layoutOctaveDot(OctaveDot* item, LayoutContext& ctx)
+void TLayout::layoutOctaveDot(OctaveDot* item)
 {
     LAYOUT_CALL_ITEM(item);
     OctaveDot::LayoutData* ldata = item->mutldata();

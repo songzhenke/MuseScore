@@ -1303,7 +1303,7 @@ void ChordLayout::updateLedgerLines(Chord* item, LayoutContext& ctx)
     }
 
     // need ledger lines?
-    if (isJianpu || item->downLine() + stepOffset <= lineBelow + 1 && item->upLine() + stepOffset >= -1) {
+    if (isJianpu || (item->downLine() + stepOffset <= lineBelow + 1 && item->upLine() + stepOffset >= -1)) {
         muse::DeleteAll(item->ledgerLines());
         item->ledgerLines().clear();
         return;
@@ -1710,7 +1710,7 @@ void ChordLayout::layoutDurationLines(Chord* item, LayoutContext& ctx)
             dl->setParent(item);
             dl->setTrack(track);
             dl->setVisible(staffVisible);
-            if (i >= prevLines) {
+            if (i >= static_cast<int>(prevLines)) {
                 prevOffsetX = 0.0; // Do not join to duration line in previous chord
             }
             double minX = hx - prevOffsetX; // extend to join to previous duration line
@@ -1805,7 +1805,7 @@ void ChordLayout::layoutOctaveDots(Chord* item, LayoutContext& ctx)
     }
 
     for (OctaveDot* od : item->octaveDots()) {
-        TLayout::layoutOctaveDot(od, ctx);
+        TLayout::layoutOctaveDot(od);
     }
 }
 

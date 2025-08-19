@@ -939,7 +939,7 @@ Chord* Chord::next() const
     return nullptr;
 }
 template <class T>
-void Chord::resizeTo(std::vector<T*> vec, size_t newSize)
+void Chord::resizeTo(std::vector<T*>& vec, size_t newSize)
 {
     int diff = static_cast<int>(newSize - vec.size());
     if (diff > 0) {

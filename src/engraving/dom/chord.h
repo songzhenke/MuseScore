@@ -379,7 +379,7 @@ private:
     // `includeTemporarySiblings`: whether items that are deleted & recreated during every layout should also be processed
     void processSiblings(std::function<void(EngravingItem*)> func, bool includeTemporarySiblings) const;
 
-    template<class T> void resizeTo(std::vector<T*>vec, size_t newSize);
+    template<class T> void resizeTo(std::vector<T*> &vec, size_t newSize);
 
     std::vector<Note*> m_notes;           // sorted to decreasing line step
     std::vector<DurationLine*> m_durationLines;
