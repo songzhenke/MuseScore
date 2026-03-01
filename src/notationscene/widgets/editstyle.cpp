@@ -150,6 +150,7 @@ static const QStringList ALL_TEXT_STYLE_SUBPAGE_CODES {
     "fretboard-diagram-fret-number",
     "harp-pedal-diagram",
     "harp-pedal-text-diagram",
+    "jianpu-number",
     "text-line",
     "system-text-line",
     "note-line",
