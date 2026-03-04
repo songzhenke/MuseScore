@@ -620,6 +620,16 @@ void MStyle::read(XmlReader& e, compat::ReadChordListHook* readChordListHook, in
         } else if (tag == "measureNumberAllStaves" || tag == "measureNumberAllStaffs" /*old typo*/) {
             bool allStaves = e.readBool();
             set(Sid::measureNumberPlacementMode, allStaves ? MeasureNumberPlacement::ON_ALL_STAVES : MeasureNumberPlacement::ABOVE_SYSTEM);
+        } else if (tag == "JianpuNumberVerticalDistance") {
+            set(Sid::jianpuNumberVerticalDistance, Spatium(e.readDouble()));
+        } else if (tag == "JianpuOctaveDotDiameter") {
+            set(Sid::jianpuOctaveDotDiameter, Spatium(e.readDouble()));
+        } else if (tag == "JianpuOctaveDotDistance") {
+            set(Sid::jianpuOctaveDotDistance, Spatium(e.readDouble()));
+        } else if (tag == "JianpuDurationLineThickness") {
+            set(Sid::jianpuDurationLineThickness, Spatium(e.readDouble()));
+        } else if (tag == "JianpuDurationLineDistance") {
+            set(Sid::jianpuDurationLineDistance, Spatium(e.readDouble()));
         } else if (!readProperties(e)) {
             e.unknown();
         }

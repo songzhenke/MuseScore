@@ -98,6 +98,7 @@ static const QStringList ALL_PAGE_CODES {
     "chord-symbols",
     "fretboard-diagrams",
     "tablature-styles",
+    "jianpu",
     "text-styles"
 };
 
@@ -671,6 +672,12 @@ EditStyle::EditStyle(QWidget* parent)
         { StyleId::tabShowTiedFret, false, tabShowTiedFrets, 0 },
         { StyleId::tabParenthesizeTiedFret, false, tabParenthFrets, 0 },
         { StyleId::parenthesizeTiedFretIfArticulation, false, tabParenthArticulation, 0 },
+
+        { StyleId::jianpuNumberVerticalDistance, false, jianpuNumberVerticalDistance, jianpuNumberVerticalDistanceReset },
+        { StyleId::jianpuOctaveDotDiameter, false, jianpuOctaveDotDiameter, jianpuOctaveDotDiameterReset },
+        { StyleId::jianpuOctaveDotDistance, false, jianpuOctaveDotDistance, jianpuOctaveDotDistanceReset },
+        { StyleId::jianpuDurationLineThickness, false, jianpuDurationLineThickness, jianpuDurationLineThicknessReset },
+        { StyleId::jianpuDurationLineDistance, false, jianpuDurationLineDistance, jianpuDurationLineDistanceReset },
     };
 
     // ====================================================

@@ -183,8 +183,10 @@ void RestLayout::layoutRestForJianpu(const Rest* item, Rest::LayoutData* ldata, 
     const Staff* staff = item->staff();
     const StaffType* st = staff->staffTypeForElement(item);
 
+    // Jianpu Y origin is at the center of the number.
+    // It always starts half a spatium above, aligned with the middle of the measure line.
+    const double hy = -item->spatium() * .5 * item->mag();
     const double hx = ldata->bbox().x();
-    const double hy = -item->spatium() * .5;
     ldata->setPos(hx, hy);
 
     staff_idx_t idx = item->staffIdx() + item->staffMove();
@@ -204,7 +206,7 @@ void RestLayout::layoutRestForJianpu(const Rest* item, Rest::LayoutData* ldata, 
     muse::draw::FontMetrics fm(font);
     const double width = fm.width(String(u"0")) / item->magS();
     const double height = st->jianpuBoxH() * item->magS();
-    const double distance = item->spatium() * .3;
+    const double distance = ctx.conf().styleAbsolute(Sid::jianpuDurationLineDistance) * item->magS();
     const_cast<Rest*>(item)->resizeDurationLinesTo(std::max(augmentationLines, diminutionLines));
 
     RectF noteBBox = RectF(0, -height * .5, width, height);

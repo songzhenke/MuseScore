@@ -2199,6 +2199,11 @@ enum class Sid : short {
     palmMuteEndFilledArrowHeight,
     palmMuteEndFilledArrowWidth,
 
+    jianpuNumberVerticalDistance,
+    jianpuOctaveDotDiameter,
+    jianpuOctaveDotDistance,
+    jianpuDurationLineThickness,
+    jianpuDurationLineDistance,
     STYLES
 };
 
