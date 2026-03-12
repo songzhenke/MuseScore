@@ -676,8 +676,9 @@ EditStyle::EditStyle(QWidget* parent)
         { StyleId::jianpuNumberVerticalDistance, false, jianpuNumberVerticalDistance, jianpuNumberVerticalDistanceReset },
         { StyleId::jianpuOctaveDotDiameter, false, jianpuOctaveDotDiameter, jianpuOctaveDotDiameterReset },
         { StyleId::jianpuOctaveDotDistance, false, jianpuOctaveDotDistance, jianpuOctaveDotDistanceReset },
+        { StyleId::jianpuDiminutionBeamThickness, false, jianpuDiminutionBeamThickness, jianpuDiminutionBeamThicknessReset },
+        { StyleId::jianpuDiminutionBeamDistance, false, jianpuDiminutionBeamDistance, jianpuDiminutionBeamDistanceReset },
         { StyleId::jianpuDurationLineThickness, false, jianpuDurationLineThickness, jianpuDurationLineThicknessReset },
-        { StyleId::jianpuDurationLineDistance, false, jianpuDurationLineDistance, jianpuDurationLineDistanceReset },
     };
 
     // ====================================================

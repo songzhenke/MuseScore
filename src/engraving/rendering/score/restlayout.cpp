@@ -193,47 +193,33 @@ void RestLayout::layoutRestForJianpu(const Rest* item, Rest::LayoutData* ldata, 
     track_idx_t track = staff2track(idx);
     bool staffVisible = !staff->isLinesInvisible(tick);
 
-    int augmentationLines = item->durationType().augmentationLines();
-    int diminutionLines = item->durationType().diminutionLines();
-    if (augmentationLines == 0 && diminutionLines == 0) {
-        muse::DeleteAll(item->durationLines());
-        const_cast<Rest*>(item)->durationLines().clear();
-    }
-
     muse::draw::Font font(item->staffType()->jianpuFont());
     font.setPointSizeF(font.pointSizeF() * item->mag());
 
     muse::draw::FontMetrics fm(font);
     const double width = fm.width(String(u"0")) / item->magS();
     const double height = st->jianpuBoxH() * item->magS();
-    const double distance = ctx.conf().styleAbsolute(Sid::jianpuDurationLineDistance) * item->magS();
-    const_cast<Rest*>(item)->resizeDurationLinesTo(std::max(augmentationLines, diminutionLines));
 
     RectF noteBBox = RectF(0, -height * .5, width, height);
     ldata->setBbox(noteBBox);
+    int lines = item->durationType().augmentationLines();
+    if (lines == 0) {
+        muse::DeleteAll(item->durationLines());
+        const_cast<Rest*>(item)->durationLines().clear();
+    } else {
+        const_cast<Rest*>(item)->resizeDurationLinesTo(lines);
+        for (int i = 0; i < lines; ++i) {
+            DurationLine* dl = item->durationLines()[i];
+            dl->setParent(const_cast<Rest*>(item));
+            dl->setTrack(track);
+            dl->setVisible(staffVisible);
+            dl->setLen(width);
+            dl->setPos(hx + width * 1.2 * (i + 1), hy);
+        }
 
-    for (int i = 0; i < diminutionLines; ++i) {
-        DurationLine* dl = item->durationLines()[i];
-        dl->setParent(const_cast<Rest*>(item));
-        dl->setTrack(track);
-        dl->setVisible(staffVisible);
-        dl->setLen(width);
-        dl->setPos(hx, hy + height * .5 + (i + 1) * distance);
-        dl->setHalving(true); // Halving duration
-    }
-
-    for (int i = 0; i < augmentationLines; ++i) {
-        DurationLine* dl = item->durationLines()[i];
-        dl->setParent(const_cast<Rest*>(item));
-        dl->setTrack(track);
-        dl->setVisible(staffVisible);
-        dl->setLen(width);
-        dl->setPos(hx + width * 1.2 * (i + 1), hy);
-        dl->setHalving(false); // Lengthening duration
-    }
-
-    for (DurationLine* dl : item->durationLines()) {
-        TLayout::layoutDurationLine(dl, ctx);
+        for (DurationLine* dl : item->durationLines()) {
+            TLayout::layoutDurationLine(dl, ctx);
+        }
     }
 }
 

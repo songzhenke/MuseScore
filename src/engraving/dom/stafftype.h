@@ -409,7 +409,7 @@ private:
 
     TextStyleType m_jianpuTextStyle = TextStyleType::JIANPU_NUMBER;
     muse::draw::Font m_jianpuFont;  // font used to draw jianpu; cached for efficiency
-    double m_jianpuFontSize  = 10.0; // the size (in points) for the jianpu font
+    double m_jianpuFontSize  = 9.0; // the size (in points) for the jianpu font
     double m_jianpuBoxH = 0.0;
 
     // the array of configured fonts

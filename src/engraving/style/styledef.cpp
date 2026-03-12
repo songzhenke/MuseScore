@@ -2185,8 +2185,9 @@ const std::array<StyleDef::StyleValue, size_t(Sid::STYLES)> StyleDef::styleValue
     styleDef(jianpuNumberVerticalDistance,               0.5_sp),
     styleDef(jianpuOctaveDotDiameter,                    0.1_sp),
     styleDef(jianpuOctaveDotDistance,                    0.3_sp),
+    styleDef(jianpuDiminutionBeamThickness,              0.1_sp),
+    styleDef(jianpuDiminutionBeamDistance,               0.3_sp),
     styleDef(jianpuDurationLineThickness,                0.1_sp),
-    styleDef(jianpuDurationLineDistance,                 0.3_sp),
 } };
 
 #undef styleDef

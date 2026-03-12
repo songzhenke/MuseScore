@@ -2698,14 +2698,15 @@ void TDraw::draw(const ShadowNote* item, Painter* painter, const PaintOptions&)
         auto bbox = item->ldata()->bbox();
         double jianpuX = (noteheadWidth - jianpuWidth) * .5;
         double jianpuY = bbox.y();
-        double lineDistance = item->style().styleAbsolute(Sid::jianpuDurationLineDistance) * item->magS();
+        double lineDistance = item->style().styleAbsolute(Sid::jianpuDiminutionBeamDistance) * item->magS();
+        double lineThickness = item->style().styleAbsolute(Sid::jianpuDiminutionBeamThickness) * item->magS();
         double dotDistance = item->style().styleAbsolute(Sid::jianpuOctaveDotDistance) * item->magS();
         double rad = item->style().styleAbsolute(Sid::jianpuOctaveDotDiameter) * item->magS();
 
         if (item->lineIndex() >= 0) {
             jianpuY = bbox.height() + bbox.y();
             jianpuY -= jianpuHeight;
-            jianpuY -= dotDistance * abs(item->jianpuOctaveDot()) + lineDistance * item->jianpuDurationLine();
+            jianpuY -= dotDistance * abs(item->jianpuOctaveDots()) + lineDistance * item->jianpuDiminutionLines();
             jianpuY -= rad * 2;
         }
 
@@ -2715,25 +2716,25 @@ void TDraw::draw(const ShadowNote* item, Painter* painter, const PaintOptions&)
         painter->setBrush(Brush(pen.color()));
 
         double dotX = noteheadWidth * .5;
-        for (int i = 0; i < -item->jianpuOctaveDot(); i++) {
+        for (int i = 0; i < -item->jianpuOctaveDots(); i++) {
             painter->drawEllipse(PointF(dotX, jianpuY + rad), rad, rad);
             jianpuY += dotDistance;
         }
 
         jianpuY += jianpuHeight;
         painter->drawText(jianpuX, jianpuY, item->jianpuDigit());
-        jianpuY += item->jianpuDurationLine() ? lineDistance : dotDistance;
+        jianpuY += item->jianpuDiminutionLines() ? lineDistance : dotDistance;
 
-        pen.setWidthF(lw);
+        pen.setWidthF(lineThickness);
         painter->setPen(pen);
-        for (int i = 0; i < item->jianpuDurationLine(); i++) {
+        for (int i = 0; i < item->jianpuDiminutionLines(); i++) {
             painter->drawLine(LineF(0.0, jianpuY, noteheadWidth, jianpuY));
             jianpuY += lineDistance;
         }
 
         pen.setWidthF(1.0);
         painter->setPen(pen);
-        for (int i = 0; i < item->jianpuOctaveDot(); i++) {
+        for (int i = 0; i < item->jianpuOctaveDots(); i++) {
             painter->drawEllipse(PointF(dotX, jianpuY + rad), rad, rad);
             jianpuY += dotDistance;
         }

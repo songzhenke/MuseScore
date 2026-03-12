@@ -1815,7 +1815,7 @@ void TLayout::layoutDurationLine(DurationLine* item, const LayoutContext& ctx)
     double mag = item->mag();
     DurationLine::LayoutData* ldata = item->mutldata();
     ldata->setMag(mag);
-    ldata->lineWidth = ctx.conf().styleAbsolute(Sid::staffLineWidth) * mag;
+    ldata->lineWidth = ctx.conf().styleAbsolute(Sid::jianpuDurationLineThickness) * mag;
     if (item->staff()) {
         const_cast<DurationLine*>(item)->setColor(item->staff()->staffType(item->tick())->color());
     }
@@ -4714,7 +4714,7 @@ void TLayout::layoutShadowNote(ShadowNote* item, LayoutContext& ctx)
             }
         }
         double dotDistance = ctx.conf().styleAbsolute(Sid::jianpuOctaveDotDistance) * mag;
-        double lineDistance = ctx.conf().styleAbsolute(Sid::jianpuDurationLineDistance) * mag;
+        double lineDistance = ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamDistance) * mag;
         jianpuBbox.setHeight(st->jianpuBoxH() * mag + dotDistance);
         if (!up) {
             jianpuBbox.setY(noteheadBbox.y() - jianpuBbox.height()); // Jianpu is above the head note
@@ -4722,12 +4722,12 @@ void TLayout::layoutShadowNote(ShadowNote* item, LayoutContext& ctx)
             jianpuBbox.setY(newBbox.y() + newBbox.height()); // Jianpu is under the head note
         }
 
-        // jianpu duration line
+        // jianpu diminution line
         int lines = item->duration().diminutionLines();
-        item->setJianpuDurationLine(lines);
+        item->setJianpuDiminutionLines(lines);
 
         // jianpu octave dots
-        item->setJianpuOctaveDot(dots);
+        item->setJianpuOctaveDots(dots);
 
         // Always has one extra distance
         double extraHeight = (1 + abs(dots)) * dotDistance + lines * lineDistance;

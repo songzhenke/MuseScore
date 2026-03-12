@@ -626,10 +626,12 @@ void MStyle::read(XmlReader& e, compat::ReadChordListHook* readChordListHook, in
             set(Sid::jianpuOctaveDotDiameter, Spatium(e.readDouble()));
         } else if (tag == "JianpuOctaveDotDistance") {
             set(Sid::jianpuOctaveDotDistance, Spatium(e.readDouble()));
+        } else if (tag == "JianpuDiminutionBeamThickness") {
+            set(Sid::jianpuDiminutionBeamThickness, Spatium(e.readDouble()));
+        } else if (tag == "JianpuDiminutionBeamDistance") {
+            set(Sid::jianpuDiminutionBeamDistance, Spatium(e.readDouble()));
         } else if (tag == "JianpuDurationLineThickness") {
             set(Sid::jianpuDurationLineThickness, Spatium(e.readDouble()));
-        } else if (tag == "JianpuDurationLineDistance") {
-            set(Sid::jianpuDurationLineDistance, Spatium(e.readDouble()));
         } else if (!readProperties(e)) {
             e.unknown();
         }
