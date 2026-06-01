@@ -642,8 +642,8 @@ void MStyle::read(XmlReader& e, compat::ReadChordListHook* readChordListHook, in
             }
         } else if (tag == "JianpuNumberVerticalDistance") {
             set(Sid::jianpuNumberVerticalDistance, Spatium(e.readDouble()));
-        } else if (tag == "JianpuOctaveDotDiameter") {
-            set(Sid::jianpuOctaveDotDiameter, Spatium(e.readDouble()));
+        } else if (tag == "JianpuOctaveDotRadius") {
+            set(Sid::jianpuOctaveDotRadius, Spatium(e.readDouble()));
         } else if (tag == "JianpuOctaveDotDistance") {
             set(Sid::jianpuOctaveDotDistance, Spatium(e.readDouble()));
         } else if (tag == "JianpuDiminutionBeamThickness") {

@@ -2228,7 +2228,7 @@ const std::array<StyleDef::StyleValue, size_t(Sid::STYLES)> StyleDef::styleValue
     styleDef(palmMuteEndFilledArrowWidth,                0.85_sp),
 
     styleDef(jianpuNumberVerticalDistance,               0.5_sp),
-    styleDef(jianpuOctaveDotDiameter,                    0.1_sp),
+    styleDef(jianpuOctaveDotRadius,                      0.1_sp),
     styleDef(jianpuOctaveDotDistance,                    0.3_sp),
     styleDef(jianpuDiminutionBeamThickness,              0.1_sp),
     styleDef(jianpuDiminutionBeamDistance,               0.3_sp),

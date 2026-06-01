@@ -2747,7 +2747,7 @@ void TDraw::draw(const ShadowNote* item, Painter* painter, const PaintOptions&)
         double lineDistance = item->style().styleAbsolute(Sid::jianpuDiminutionBeamDistance) * item->magS();
         double lineThickness = item->style().styleAbsolute(Sid::jianpuDiminutionBeamThickness) * item->magS();
         double dotDistance = item->style().styleAbsolute(Sid::jianpuOctaveDotDistance) * item->magS();
-        double rad = item->style().styleAbsolute(Sid::jianpuOctaveDotDiameter) * item->magS();
+        double rad = item->style().styleAbsolute(Sid::jianpuOctaveDotRadius) * item->magS();
 
         if (item->lineIndex() >= 0) {
             jianpuY = bbox.height() + bbox.y();

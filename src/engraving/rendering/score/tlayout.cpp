@@ -4283,7 +4283,7 @@ void TLayout::layoutOctaveDot(OctaveDot* item, LayoutContext& ctx)
 
     double mag = item->note()->mag();
     ldata->setMag(mag);
-    ldata->radius = ctx.conf().styleAbsolute(Sid::jianpuOctaveDotDiameter) * mag;
+    ldata->radius = ctx.conf().styleAbsolute(Sid::jianpuOctaveDotRadius) * mag;
 
     double diameter = ldata->radius * 2;
     ldata->setBbox(0, -ldata->radius, item->len(), diameter);

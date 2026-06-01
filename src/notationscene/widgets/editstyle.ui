@@ -12832,15 +12832,15 @@ followed by dashes</string>
            <item row="1" column="0">
             <widget class="QLabel" name="label_jianpu_1">
              <property name="text">
-              <string>Octave dot diameter:</string>
+              <string>Octave dot radius:</string>
              </property>
              <property name="buddy">
-              <cstring>jianpuOctaveDotDiameter</cstring>
+              <cstring>jianpuOctaveDotRadius</cstring>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QDoubleSpinBox" name="jianpuOctaveDotDiameter">
+            <widget class="QDoubleSpinBox" name="jianpuOctaveDotRadius">
              <property name="keyboardTracking">
               <bool>false</bool>
              </property>
@@ -12856,7 +12856,7 @@ followed by dashes</string>
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="QToolButton" name="jianpuOctaveDotDiameterReset">
+            <widget class="QToolButton" name="jianpuOctaveDotRadiusReset">
              <property name="text">
               <string/>
              </property>
@@ -14324,7 +14324,7 @@ followed by dashes</string>
   <tabstop>buttonTogglePagelist</tabstop>
   <tabstop>resetStylesButton</tabstop>
   <tabstop>jianpuNumberVerticalDistance</tabstop>
-  <tabstop>jianpuOctaveDotDiameter</tabstop>
+  <tabstop>jianpuOctaveDotRadius</tabstop>
   <tabstop>jianpuOctaveDotDistance</tabstop>
   <tabstop>jianpuDiminutionBeamThickness</tabstop>
   <tabstop>jianpuDiminutionBeamDistance</tabstop>
