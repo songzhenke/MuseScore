@@ -190,7 +190,7 @@ void RestLayout::layoutRestForJianpu(const Rest* item, Rest::LayoutData* ldata, 
     // Jianpu Y origin is at the center of the number.
     // It always starts half a spatium above, aligned with the middle of the measure line.
     const double hy = -item->spatium() * .5 * item->mag();
-    const double hx = ldata->bbox().x();
+    const double hx = 0.0;
     ldata->setPos(hx, hy);
 
     staff_idx_t idx = item->staffIdx() + item->staffMove();
