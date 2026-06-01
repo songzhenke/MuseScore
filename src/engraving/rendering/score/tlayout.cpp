@@ -255,6 +255,9 @@ void TLayout::layoutItem(EngravingItem* item, LayoutContext& ctx)
     case ElementType::DEAD_SLAPPED:
         layoutDeadSlapped(item_cast<const DeadSlapped*>(item), static_cast<DeadSlapped::LayoutData*>(ldata));
         break;
+    case ElementType::DURATION_LINE:
+        layoutDurationLine(item_cast<DurationLine*>(item), ctx);
+        break;
     case ElementType::DYNAMIC:
         layoutDynamic(item_cast<Dynamic*>(item), static_cast<Dynamic::LayoutData*>(ldata), ctx.conf());
         break;
@@ -1733,6 +1736,8 @@ void TLayout::layoutClef(const Clef* item, Clef::LayoutData* ldata, const Layout
         const Fraction tickPrev = tick - Fraction::eps();
 
         if (item->staff()->isJianpuStaff(tick)) {
+            ldata->setBbox(RectF());
+            ldata->symId = SymId::noSym;
             return; // Jianpu do not need to show clef
         }
 
