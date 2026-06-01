@@ -12824,8 +12824,14 @@ followed by dashes</string>
            </item>
            <item row="0" column="2">
             <widget class="QToolButton" name="jianpuNumberVerticalDistanceReset">
+             <property name="toolTip">
+              <string>Reset to default</string>
+             </property>
+             <property name="accessibleName">
+              <string>Reset 'Vertical distance' value</string>
+             </property>            
              <property name="text">
-              <string/>
+              <string notr="true"/>
              </property>
             </widget>
            </item>
@@ -12857,8 +12863,14 @@ followed by dashes</string>
            </item>
            <item row="1" column="2">
             <widget class="QToolButton" name="jianpuOctaveDotRadiusReset">
+             <property name="toolTip">
+              <string>Reset to default</string>
+             </property>
+             <property name="accessibleName">
+              <string>Reset 'Octave dot radius' value</string>
+             </property>            
              <property name="text">
-              <string/>
+              <string notr="true"/>
              </property>
             </widget>
            </item>
@@ -12890,8 +12902,14 @@ followed by dashes</string>
            </item>
            <item row="2" column="2">
             <widget class="QToolButton" name="jianpuOctaveDotDistanceReset">
+             <property name="toolTip">
+              <string>Reset to default</string>
+             </property>
+             <property name="accessibleName">
+              <string>Reset 'Octave dot distance' value</string>
+             </property>
              <property name="text">
-              <string/>
+              <string notr="true"/>
              </property>
             </widget>
            </item>
@@ -12923,8 +12941,14 @@ followed by dashes</string>
            </item>
            <item row="3" column="2">
             <widget class="QToolButton" name="jianpuDiminutionBeamThicknessReset">
+             <property name="toolTip">
+              <string>Reset to default</string>
+             </property>
+             <property name="accessibleName">
+              <string>Reset 'Diminution beam thickness' value</string>
+             </property>
              <property name="text">
-              <string/>
+              <string notr="true"/>
              </property>
             </widget>
            </item>
@@ -12956,8 +12980,14 @@ followed by dashes</string>
            </item>
            <item row="4" column="2">
             <widget class="QToolButton" name="jianpuDiminutionBeamDistanceReset">
+             <property name="toolTip">
+              <string>Reset to default</string>
+             </property>
+             <property name="accessibleName">
+              <string>Reset 'Diminution beam distance' value</string>
+             </property>
              <property name="text">
-              <string/>
+              <string notr="true"/>
              </property>
             </widget>
            </item>
@@ -12989,8 +13019,14 @@ followed by dashes</string>
            </item>
            <item row="5" column="2">
             <widget class="QToolButton" name="jianpuDurationLineThicknessReset">
+             <property name="toolTip">
+              <string>Reset to default</string>
+             </property>
+             <property name="accessibleName">
+              <string>Reset 'Duration line thickness' value</string>
+             </property>
              <property name="text">
-              <string/>
+              <string notr="true"/>
              </property>
             </widget>
            </item>
