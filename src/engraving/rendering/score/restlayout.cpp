@@ -179,7 +179,11 @@ void RestLayout::fillShape(const Rest* item, Rest::LayoutData* ldata, const Layo
 
 void RestLayout::layoutRestForJianpu(const Rest* item, Rest::LayoutData* ldata, const LayoutContext& ctx)
 {
-    Fraction tick = item->measure()->ticks();
+    const Measure* measure = item->measure();
+    if (!measure) {
+        return;
+    }
+    Fraction tick = measure->ticks();
     const Staff* staff = item->staff();
     const StaffType* st = staff->staffTypeForElement(item);
 
