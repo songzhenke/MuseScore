@@ -1096,9 +1096,9 @@ const std::array<StyleDef::StyleValue, size_t(Sid::STYLES)> StyleDef::styleValue
     styleDef(jianpuNumberAlign,                         Align(AlignH::LEFT, AlignV::BASELINE)),
     styleDef(jianpuNumberOffset,                        PointF()),
     styleDef(jianpuNumberFrameType,                     int(FrameType::NO_FRAME)),
-    styleDef(jianpuNumberFramePadding,                  0.2),
-    styleDef(jianpuNumberFrameWidth,                    0.1),
-    styleDef(jianpuNumberFrameRound,                    0),
+    styleDef(jianpuNumberFramePadding,                  0.2_sp),
+    styleDef(jianpuNumberFrameWidth,                    0.1_sp),
+    styleDef(jianpuNumberFrameRound,                    0.0_sp),
     styleDef(jianpuNumberFrameFgColor,                  PropertyValue::fromValue(Color::BLACK)),
     styleDef(jianpuNumberFrameBgColor,                  PropertyValue::fromValue(Color::transparent)),
 
