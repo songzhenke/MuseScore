@@ -4135,4 +4135,3 @@ bool Note::transpose(Interval interval, bool useDoubleSharpsFlats)
     return true;
 }
 }
-
