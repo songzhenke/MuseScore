@@ -4710,7 +4710,7 @@ void TLayout::layoutShadowNote(ShadowNote* item, LayoutContext& ctx)
         double lw = ctx.conf().styleAbsolute(Sid::ledgerLineWidth);
 
         // jianpu will show the 5-line staff with more extra length
-        if (isJianpu && lineIdx > 0) {
+        if (isJianpu) {
             x -= 2 * extraLen;
             w += 4 * extraLen;
         }
