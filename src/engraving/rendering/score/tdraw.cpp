@@ -2365,7 +2365,6 @@ void TDraw::draw(const Note* item, Painter* painter, const PaintOptions& opt)
     const auto config = item->configuration();
     const StaffType* staffType = item->staff() ? item->staff()->staffTypeForElement(item) : nullptr;
 
-    const bool isJianpu = item->staff() && item->staff()->isJianpuStaff(item->tick());
     const bool isTabStaff = staffType && staffType->isTabStaff();
     const bool negativeFret = isTabStaff && item->negativeFretUsed();
     const bool useCriticalColor = negativeFret && !item->deadNote() && !opt.isPrinting;
@@ -2396,11 +2395,8 @@ void TDraw::draw(const Note* item, Painter* painter, const PaintOptions& opt)
         const double yOffset = tab->fretFontYOffset();
         painter->drawText(PointF(startPosX, yOffset * item->magS()), item->fretString());
     }
-    // NOT tablature
-    else if (isJianpu) {
-        const Staff* staff = item->staff();
-        const StaffType* staffType = staff->staffTypeForElement(item);
-
+    // Jianpu
+    else if (staffType && item->isJianpuStaff()) {
         Font f(staffType->jianpuFont());
         f.setPointSizeF(f.pointSizeF() * item->magS());
         painter->setFont(f);
