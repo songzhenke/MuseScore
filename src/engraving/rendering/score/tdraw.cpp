@@ -2402,7 +2402,7 @@ void TDraw::draw(const Note* item, Painter* painter, const PaintOptions& opt)
         painter->setFont(f);
 
         FontMetrics fm(f);
-        const double fw = fm.width(item->jianpuDigit()) / item->magS();
+        const double fw = fm.width(item->jianpuDigit());
         const double bw = ldata->bbox().width();
         const double startPosX = ldata->bbox().x() + (bw - fw) * .5;
         const double startPosY = ldata->bbox().bottom();
@@ -2734,7 +2734,7 @@ void TDraw::draw(const ShadowNote* item, Painter* painter, const PaintOptions&)
         painter->setFont(f);
 
         FontMetrics fm(f);
-        const double jianpuWidth = fm.width(item->jianpuDigit()) / item->magS();
+        const double jianpuWidth = fm.width(item->jianpuDigit());
         const double jianpuHeight = staffType->jianpuBoxH() * item->magS();
 
         auto bbox = item->ldata()->bbox();

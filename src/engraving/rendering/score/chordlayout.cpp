@@ -1789,7 +1789,7 @@ void ChordLayout::layoutOctaveDots(Chord* item, LayoutContext& ctx)
         }
 
         double hw = note->headWidth();
-        double minX = note->pos().x() + note->bboxXShift();
+        double minX = note->bboxXShift();
         double maxX = minX + hw;
 
         note->resizeOctaveDotsTo(dots);
