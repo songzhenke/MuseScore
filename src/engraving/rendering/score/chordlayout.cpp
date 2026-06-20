@@ -81,6 +81,19 @@ using namespace mu::engraving::rendering::score;
 
 static constexpr Spatium STAFFTYPE_TAB_DEFAULTDOTDIST_X = 0.75_sp;
 
+static double jianpuBeamOffset(const Chord* chord, const LayoutContext& ctx)
+{
+    const Beam* beam = chord->beam();
+    if (!beam || ctx.conf().styleV(Sid::jianpuDiminutionBeamPlacement).value<PlacementV>() != PlacementV::BELOW) {
+        return 0.0;
+    }
+
+    const int lines = BeamTremoloLayout::strokeCount(beam->ldata(), chord);
+    const double thickness = ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamThickness);
+    const double distance = ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamDistance);
+    return (thickness * 0.5 + distance * lines) * chord->magS();
+}
+
 void ChordLayout::layout(Chord* item, LayoutContext& ctx)
 {
     if (item->notes().empty()) {
@@ -173,13 +186,9 @@ void ChordLayout::layoutPitched(Chord* item, LayoutContext& ctx)
                 jianpuOffsetY += dots.size() * dotDistance;
             }
 
+            // Add extra offset for beam if it is upnote
             if (note == upnote) {
-                Beam* beam = item->beam();
-                if (beam) {
-                    jianpuOffsetY += ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamDistance) * itemMag;
-                    jianpuOffsetY -= ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamThickness) * itemMag;
-                    jianpuOffsetY += beam->ldata()->bbox().height();
-                }
+                jianpuOffsetY += jianpuBeamOffset(item, ctx);
             }
 
             jianpuOffsetY += ldata->bbox().height();
@@ -1785,12 +1794,7 @@ void ChordLayout::layoutOctaveDots(Chord* item, LayoutContext& ctx)
             offsetY = height * .5 + distance;
             if (note == item->upNote()) {
                 // The octave dot should be under the jianpu beam
-                Beam* beam = item->beam();
-                if (beam) {
-                    offsetY += ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamDistance) * item->magS();
-                    offsetY -= ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamThickness) * item->magS();
-                    offsetY += beam->ldata()->bbox().height();
-                }
+                offsetY += jianpuBeamOffset(item, ctx);
             }
         } else {
             note->resizeOctaveDotsTo(0);
