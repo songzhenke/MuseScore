@@ -89,9 +89,8 @@ static double jianpuBeamOffset(const Chord* chord, const LayoutContext& ctx)
     }
 
     const int lines = BeamTremoloLayout::strokeCount(beam->ldata(), chord);
-    const double thickness = ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamThickness);
     const double distance = ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamDistance);
-    return (thickness * 0.5 + distance * lines) * chord->magS();
+    return (distance * lines) * chord->magS();
 }
 
 void ChordLayout::layout(Chord* item, LayoutContext& ctx)
@@ -171,6 +170,10 @@ void ChordLayout::layoutPitched(Chord* item, LayoutContext& ctx)
 
         if (isJianpuStaff) {
             std::vector<OctaveDot*> dots = note->octaveDots();
+            // Jianpu spacing rules for octave dots, beams, and notes:
+            // - Dot-to-note uses dot centerline to note boundary distance.
+            // - Beam-to-note uses beam centerline to note boundary distance.
+            // - Dot-to-dot and beam-to-dot/beam use centerline-to-centerline distance.
             const double dotDistance = ctx.conf().styleAbsolute(Sid::jianpuOctaveDotDistance) * itemMag;
 
             // Move the current note down if it is has octave dots above it

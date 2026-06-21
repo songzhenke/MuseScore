@@ -630,9 +630,7 @@ bool BeamTremoloLayout::calculateAnchors(const BeamBase* item, BeamBase::LayoutD
     double beamDotStack = 0.0;
     bool beamAbove = false;
     double beamDistance = 0.0;
-    double beamThickness = 0.0;
     double dotDistance = 0.0;
-    double dotRadius = 0.0;
 
     for (auto chordRest : chordRests) {
         if (!startCr) {
@@ -640,9 +638,7 @@ bool BeamTremoloLayout::calculateAnchors(const BeamBase* item, BeamBase::LayoutD
             if (isJianpuStaff) {
                 beamAbove = ctx.conf().styleV(Sid::jianpuDiminutionBeamPlacement).value<PlacementV>() == PlacementV::ABOVE;
                 beamDistance = ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamDistance) * startCr->mag();
-                beamThickness = ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamThickness) * startCr->mag();
                 dotDistance = ctx.conf().styleAbsolute(Sid::jianpuOctaveDotDistance) * startCr->mag();
-                dotRadius = ctx.conf().styleAbsolute(Sid::jianpuOctaveDotRadius) * startCr->mag();
             }
         }
 
@@ -676,8 +672,8 @@ bool BeamTremoloLayout::calculateAnchors(const BeamBase* item, BeamBase::LayoutD
             }
 
             const int beamLines = strokeCount(ldata, chordRest);
-            const double beamStack = beamLines * beamDistance + beamThickness * 0.5;
-            const double dotStack = aboveDots > 0 ? aboveDots * dotDistance + dotRadius : 0.0;
+            const double beamStack = beamLines * beamDistance;
+            const double dotStack = aboveDots > 0 ? aboveDots * dotDistance : 0.0;
             beamDotStack = std::max(beamDotStack, beamStack + dotStack);
         }
     }
