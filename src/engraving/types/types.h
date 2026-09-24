@@ -1084,6 +1084,12 @@ enum class CourtesyBarlineMode : char {
     DOUBLE_BEFORE_COURTESY = 2,
 };
 
+// How the tonic ("1") of a Jianpu staff is determined
+enum class JianpuTonicMode : char {
+    FOLLOW_SCORE_KEY = 0,     // tonic follows the actual key signature
+    FIXED_TONIC      = 1      // tonic is always the note in Sid::jianpuFixedTonic
+};
+
 enum class FermataType : signed char {
     Undefined = -1,
     VeryShort,
