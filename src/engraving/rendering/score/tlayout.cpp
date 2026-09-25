@@ -4882,11 +4882,8 @@ void TLayout::layoutShadowNote(ShadowNote* item, LayoutContext& ctx)
                     item->setJianpuDigit(String(u"%1").arg(stepName));
 
                     Interval transpose = item->part()->instrument(item->tick())->transpose();
-                    int alteration = static_cast<int>(tpc2alter(tpc));
                     int epitch = nval.pitch - transpose.chromatic;
-                    int octave = (epitch - alteration) / 12 - 1; // See Note::octave
-                    int baseOctave = 3; // Default base octave for Jianpu is C3
-                    dots = baseOctave - octave;
+                    dots = -pitch2JianpuOctave(epitch, tpc, jianpuKey);
                 }
             }
         }
