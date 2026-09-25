@@ -106,6 +106,7 @@ static const QStringList ALL_PAGE_CODES {
     "chord-symbols",
     "fretboard-diagrams",
     "tablature-styles",
+    "jianpu",
     "text-styles"
 };
 
@@ -160,6 +161,7 @@ static const QStringList ALL_TEXT_STYLE_SUBPAGE_CODES {
     "fretboard-diagram-fret-number",
     "harp-pedal-diagram",
     "harp-pedal-text-diagram",
+    "jianpu-number",
     "text-line",
     "system-text-line",
     "note-line",
@@ -713,6 +715,16 @@ void EditStyle::classBegin()
         { StyleId::tabShowTiedFret, false, tabShowTiedFrets, 0 },
         { StyleId::tabParenthesizeTiedFret, false, tabParenthFrets, 0 },
         { StyleId::parenthesizeTiedFretIfArticulation, false, tabParenthArticulation, 0 },
+
+        { StyleId::jianpuNumberVerticalDistance, false, jianpuNumberVerticalDistance, jianpuNumberVerticalDistanceReset },
+        { StyleId::jianpuOctaveDotRadius, false, jianpuOctaveDotRadius, jianpuOctaveDotRadiusReset },
+        { StyleId::jianpuOctaveDotDistance, false, jianpuOctaveDotDistance, jianpuOctaveDotDistanceReset },
+        { StyleId::jianpuDiminutionBeamThickness, false, jianpuDiminutionBeamThickness, jianpuDiminutionBeamThicknessReset },
+        { StyleId::jianpuDiminutionBeamDistance, false, jianpuDiminutionBeamDistance, jianpuDiminutionBeamDistanceReset },
+        { StyleId::jianpuDiminutionBeamPlacement, false, jianpuDiminutionBeamPlacement, jianpuDiminutionBeamPlacementReset },
+        { StyleId::jianpuDurationLineThickness, false, jianpuDurationLineThickness, jianpuDurationLineThicknessReset },
+        { StyleId::jianpuTonicMode, false, jianpuTonicMode, jianpuTonicModeReset },
+        { StyleId::jianpuFixedTonic, false, jianpuFixedTonic, jianpuFixedTonicReset },
     };
 
     // ====================================================
@@ -777,6 +789,7 @@ void EditStyle::classBegin()
         tempoTextPlacement,
         staffTextPlacement,
         rehearsalMarkPlacement,
+        jianpuDiminutionBeamPlacement,
     };
 
     for (QComboBox* cb : verticalPlacementComboBoxes) {
@@ -801,6 +814,32 @@ void EditStyle::classBegin()
                                             int(LyricsDashSystemStart::UNDER_HEADER));
     lyricsDashStartSystemPlacement->addItem(muse::qtrc("notation/editstyle", "Under the first note"),
                                             int(LyricsDashSystemStart::UNDER_FIRST_NOTE));
+
+    jianpuTonicMode->clear();
+    jianpuTonicMode->addItem(muse::qtrc("notation/editstyle", "Follow score key"), int(JianpuTonicMode::FOLLOW_SCORE_KEY));
+    jianpuTonicMode->addItem(muse::qtrc("notation/editstyle", "Fixed tonic"), int(JianpuTonicMode::FIXED_TONIC));
+
+    static const std::pair<Key, TranslatableString> jianpuFixedTonics[] = {
+        { Key::C_B, TranslatableString("engraving", "C♭") },
+        { Key::G_B, TranslatableString("engraving", "G♭") },
+        { Key::D_B, TranslatableString("engraving", "D♭") },
+        { Key::A_B, TranslatableString("engraving", "A♭") },
+        { Key::E_B, TranslatableString("engraving", "E♭") },
+        { Key::B_B, TranslatableString("engraving", "B♭") },
+        { Key::F,   TranslatableString("engraving", "F") },
+        { Key::C,   TranslatableString("engraving", "C") },
+        { Key::G,   TranslatableString("engraving", "G") },
+        { Key::D,   TranslatableString("engraving", "D") },
+        { Key::A,   TranslatableString("engraving", "A") },
+        { Key::E,   TranslatableString("engraving", "E") },
+        { Key::B,   TranslatableString("engraving", "B") },
+        { Key::F_S, TranslatableString("engraving", "F♯") },
+        { Key::C_S, TranslatableString("engraving", "C♯") },
+    };
+    jianpuFixedTonic->clear();
+    for (const auto& [key, name] : jianpuFixedTonics) {
+        jianpuFixedTonic->addItem(name.qTranslated(), int(key));
+    }
 
     musicalSymbolFont->clear();
     dynamicsFont->clear();
@@ -2129,6 +2168,8 @@ void EditStyle::setValues()
     resetLyricsDashMaxDistance->setEnabled(lyricsDashMaxDistance->isEnabled() && styleValue(StyleId::lyricsDashMaxDistance)
                                            != defaultStyleValue(StyleId::lyricsDashMaxDistance));
 
+    jianpuFixedTonic->setEnabled(styleValue(StyleId::jianpuTonicMode).toInt() == int(JianpuTonicMode::FIXED_TONIC));
+
     updateParenthesisIndicatingTiesGroupState();
 
     bool textBracketRight = styleValue(StyleId::groupBracketTextAlign).value<DirectionH>() == DirectionH::RIGHT;
@@ -2418,6 +2459,10 @@ void EditStyle::valueChanged(int i)
                                           || styleValue(StyleId::lyricsMaxDashCount).toInt() > 1);
         resetLyricsDashMaxDistance->setEnabled(lyricsDashMaxDistance->isEnabled() && styleValue(StyleId::lyricsDashMaxDistance)
                                                != defaultStyleValue(StyleId::lyricsDashMaxDistance));
+    }
+
+    if (idx == StyleId::jianpuTonicMode) {
+        jianpuFixedTonic->setEnabled(styleValue(StyleId::jianpuTonicMode).toInt() == int(JianpuTonicMode::FIXED_TONIC));
     }
 }
 
