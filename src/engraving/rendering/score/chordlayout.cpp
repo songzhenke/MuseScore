@@ -45,6 +45,7 @@
 #include "dom/page.h"
 #include "dom/parenthesis.h"
 #include "dom/part.h"
+#include "dom/pitchspelling.h"
 #include "dom/rest.h"
 #include "dom/score.h"
 #include "dom/segment.h"
@@ -1775,18 +1776,20 @@ void ChordLayout::layoutOctaveDots(Chord* item, LayoutContext& ctx)
 
     const StaffType* st = staff->staffTypeForElement(item);
     double height = st->jianpuBoxH() * item->magS();
-    int baseOctave = 3; // Default base octave for Jianpu is C3
+    KeySigEvent ks = staff->keySigEvent(tick);
+    Key jianpuKey = ctx.conf().styleI(Sid::jianpuTonicMode) == int(JianpuTonicMode::FIXED_TONIC)
+                    ? Key(ctx.conf().styleI(Sid::jianpuFixedTonic)) : ks.key();
 
     for (Note* note : item->notes()) {
         int dots = 0;
         double offsetY = 0;
         double distance = ctx.conf().styleAbsolute(Sid::jianpuOctaveDotDistance) * item->magS();
-        int octave = note->octave();
-        if (octave > baseOctave) {
-            dots = octave - baseOctave;
+        int octave = pitch2JianpuOctave(note->epitch(), note->tpc(), jianpuKey);
+        if (octave > 0) {
+            dots = octave;
             offsetY = -(height * .5 + dots * distance);
-        } else if (octave < baseOctave) {
-            dots = baseOctave - octave;
+        } else if (octave < 0) {
+            dots = -octave;
             offsetY = height * .5 + distance;
             if (note == item->upNote()) {
                 // The octave dot should be under the jianpu beam
@@ -1807,7 +1810,7 @@ void ChordLayout::layoutOctaveDots(Chord* item, LayoutContext& ctx)
             dot->setOwnershipParent(note);
             dot->setTrack(track);
             dot->setVisible(staffVisible);
-            dot->setAbove(octave > baseOctave);
+            dot->setAbove(octave > 0);
             dot->setLen(maxX - minX);
             dot->setPos(minX, offsetY + i * distance);
         }

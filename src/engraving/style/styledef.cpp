@@ -2276,6 +2276,8 @@ const std::array<StyleDef::StyleValue, size_t(Sid::STYLES)> StyleDef::styleValue
     styleDef(jianpuDiminutionBeamDistance,               0.3_sp),
     styleDef(jianpuDiminutionBeamPlacement,              PlacementV::BELOW),
     styleDef(jianpuDurationLineThickness,                0.1_sp),
+    styleDef(jianpuTonicMode,                            int(JianpuTonicMode::FOLLOW_SCORE_KEY)),
+    styleDef(jianpuFixedTonic,                           int(Key::C)),
 } };
 
 #undef styleDef

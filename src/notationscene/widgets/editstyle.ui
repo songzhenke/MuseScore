@@ -13175,6 +13175,69 @@ followed by dashes</string>
              </property>
             </widget>
            </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_jianpu_TonicMode">
+             <property name="text">
+              <string>Tonic:</string>
+             </property>
+             <property name="buddy">
+              <cstring>jianpuTonicMode</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="QComboBox" name="jianpuTonicMode">
+             <item>
+              <property name="text">
+               <string>Follow score key</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Fixed tonic</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="7" column="2">
+            <widget class="QToolButton" name="jianpuTonicModeReset">
+             <property name="toolTip">
+              <string>Reset to default</string>
+             </property>
+             <property name="accessibleName">
+              <string>Reset 'Tonic' value</string>
+             </property>
+             <property name="text">
+              <string notr="true"/>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="label_jianpu_FixedTonic">
+             <property name="text">
+              <string>Fixed tonic note:</string>
+             </property>
+             <property name="buddy">
+              <cstring>jianpuFixedTonic</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <widget class="QComboBox" name="jianpuFixedTonic"/>
+           </item>
+           <item row="8" column="2">
+            <widget class="QToolButton" name="jianpuFixedTonicReset">
+             <property name="toolTip">
+              <string>Reset to default</string>
+             </property>
+             <property name="accessibleName">
+              <string>Reset 'Fixed tonic note' value</string>
+             </property>
+             <property name="text">
+              <string notr="true"/>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="3">
             <spacer name="horizontalSpacer_jianpu">
              <property name="orientation">
@@ -14517,6 +14580,8 @@ followed by dashes</string>
   <tabstop>jianpuDiminutionBeamDistance</tabstop>
   <tabstop>jianpuDiminutionBeamPlacement</tabstop>
   <tabstop>jianpuDurationLineThickness</tabstop>
+  <tabstop>jianpuTonicMode</tabstop>
+  <tabstop>jianpuFixedTonic</tabstop>
  </tabstops>
  <resources/>
  <connections/>

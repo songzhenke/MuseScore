@@ -506,6 +506,22 @@ TEST_F(Engraving_NoteTests, tpcDegrees)
     //QCOMPARE(tpc2degree(Tpc::TPC_B_S, Key::C_S), 7);
 }
 
+TEST_F(Engraving_NoteTests, jianpuOctave)
+{
+    EXPECT_EQ(pitch2JianpuOctave(36, Tpc::TPC_C, Key::C), -1);
+    EXPECT_EQ(pitch2JianpuOctave(48, Tpc::TPC_C, Key::C), 0);
+    EXPECT_EQ(pitch2JianpuOctave(60, Tpc::TPC_C, Key::C), 1);
+    EXPECT_EQ(pitch2JianpuOctave(72, Tpc::TPC_C, Key::C), 2);
+
+    EXPECT_EQ(pitch2JianpuOctave(43, Tpc::TPC_G, Key::G), -1);
+    EXPECT_EQ(pitch2JianpuOctave(48, Tpc::TPC_C, Key::G), -1);
+    EXPECT_EQ(pitch2JianpuOctave(55, Tpc::TPC_G, Key::G), 0);
+    EXPECT_EQ(pitch2JianpuOctave(60, Tpc::TPC_C, Key::G), 0);
+    EXPECT_EQ(pitch2JianpuOctave(66, Tpc::TPC_F_S, Key::G), 0);
+    EXPECT_EQ(pitch2JianpuOctave(67, Tpc::TPC_G, Key::G), 1);
+    EXPECT_EQ(pitch2JianpuOctave(79, Tpc::TPC_G, Key::G), 2);
+}
+
 TEST_F(Engraving_NoteTests, alteredUnison)
 {
     MasterScore* score = ScoreRW::readScore(NOTE_DATA_DIR + u"altered-unison.mscx");

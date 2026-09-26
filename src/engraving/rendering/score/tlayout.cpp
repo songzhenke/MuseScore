@@ -4218,8 +4218,10 @@ void TLayout::layoutNote(const Note* item, Note::LayoutData* ldata)
         const StaffType* jianpu = st->staffTypeForElement(item);
 
         KeySigEvent ks = st->keySigEvent(item->chord()->tick());
+        Key jianpuKey = item->style().styleI(Sid::jianpuTonicMode) == int(JianpuTonicMode::FIXED_TONIC)
+                        ? Key(item->style().styleI(Sid::jianpuFixedTonic)) : ks.key();
         String accName, stepName;
-        tpc2Function(item->tpc(), ks.key(), accName, stepName);
+        tpc2Function(item->tpc(), jianpuKey, accName, stepName);
         const_cast<Note*>(item)->setJianpuDigit(String(u"%1").arg(stepName));
 
         double width = item->headWidth();
@@ -4874,15 +4876,14 @@ void TLayout::layoutShadowNote(ShadowNote* item, LayoutContext& ctx)
                 if (tpc != Tpc::TPC_INVALID) {
                     String accName, stepName;
                     KeySigEvent ks = staff->keySigEvent(item->tick());
-                    tpc2Function(tpc, ks.key(), accName, stepName);
+                    Key jianpuKey = ctx.conf().styleI(Sid::jianpuTonicMode) == int(JianpuTonicMode::FIXED_TONIC)
+                                    ? Key(ctx.conf().styleI(Sid::jianpuFixedTonic)) : ks.key();
+                    tpc2Function(tpc, jianpuKey, accName, stepName);
                     item->setJianpuDigit(String(u"%1").arg(stepName));
 
                     Interval transpose = item->part()->instrument(item->tick())->transpose();
-                    int alteration = static_cast<int>(tpc2alter(tpc));
                     int epitch = nval.pitch - transpose.chromatic;
-                    int octave = (epitch - alteration) / 12 - 1; // See Note::octave
-                    int baseOctave = 3; // Default base octave for Jianpu is C3
-                    dots = baseOctave - octave;
+                    dots = -pitch2JianpuOctave(epitch, tpc, jianpuKey);
                 }
             }
         }

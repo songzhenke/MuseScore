@@ -90,6 +90,7 @@ extern int tpc2step(int tpc);
 extern int tpc2stepByKey(int tpc, Key, int& alter);
 extern int tpc2alterByKey(int tpc, Key);
 extern int pitch2absStepByKey(int pitch, int tpc, Key, int& alter);
+extern int pitch2JianpuOctave(int pitch, int tpc, Key key);
 extern int absStep2pitchByKey(int step, Key);
 extern int tpc2degree(int tpc, Key key);
 extern int tpcInterval(int startTpc, int interval, int alter);
