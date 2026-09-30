@@ -1777,14 +1777,15 @@ void ChordLayout::layoutOctaveDots(Chord* item, LayoutContext& ctx)
     const StaffType* st = staff->staffTypeForElement(item);
     double height = st->jianpuBoxH() * item->magS();
     KeySigEvent ks = staff->keySigEvent(tick);
-    Key jianpuKey = ctx.conf().styleI(Sid::jianpuTonicMode) == int(JianpuTonicMode::FIXED_TONIC)
-                    ? Key(ctx.conf().styleI(Sid::jianpuFixedTonic)) : ks.key();
+    [[maybe_unused]] KeyMode mode;
+    int tonicTpc;
+    jianpuKeyMapping(ks, mode, tonicTpc);
 
     for (Note* note : item->notes()) {
         int dots = 0;
         double offsetY = 0;
         double distance = ctx.conf().styleAbsolute(Sid::jianpuOctaveDotDistance) * item->magS();
-        int octave = pitch2JianpuOctave(note->epitch(), note->tpc(), jianpuKey);
+        int octave = pitch2JianpuOctave(note->epitch(), note->tpc(), tonicTpc);
         if (octave > 0) {
             dots = octave;
             offsetY = -(height * .5 + dots * distance);
