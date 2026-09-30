@@ -24,6 +24,7 @@
 
 #include "types/string.h"
 #include "../types/types.h"
+#include "key.h"
 
 namespace mu::engraving {
 class MidiNote;
@@ -91,8 +92,12 @@ extern int tpc2stepByKey(int tpc, Key, int& alter);
 extern int tpc2alterByKey(int tpc, Key);
 extern int pitch2absStepByKey(int pitch, int tpc, Key, int& alter);
 extern int pitch2JianpuOctave(int pitch, int tpc, Key key);
+extern int pitch2JianpuOctave(int pitch, int tpc, int tonicTpc);
 extern int absStep2pitchByKey(int step, Key);
 extern int tpc2degree(int tpc, Key key);
+extern int jianpuTonicTpc(Key relativeMajorKey, KeyMode mode);
+extern void tpc2Jianpu(int tpc, int tonicTpc, KeyMode mode, String& accName, String& stepName);
+extern void jianpuKeyMapping(const KeySigEvent& ks, KeyMode& mode, int& tonicTpc);
 extern int tpcInterval(int startTpc, int interval, int alter);
 extern int step2pitchInterval(int step, int alter);
 extern String tpc2Function(int tpc, Key key);

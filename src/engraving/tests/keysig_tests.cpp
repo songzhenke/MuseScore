@@ -27,6 +27,7 @@
 #include "engraving/dom/masterscore.h"
 #include "engraving/dom/measure.h"
 #include "engraving/dom/part.h"
+#include "engraving/dom/pitchspelling.h"
 #include "engraving/dom/segment.h"
 #include "engraving/dom/staff.h"
 #include "engraving/editing/editkeysig.h"
@@ -266,4 +267,82 @@ TEST_F(Engraving_KeySigTests, linkedPrecedingKeyDeletion)
             ASSERT_NO_FATAL_FAILURE(checkInstrumentChangeKey(target, Key::C, Key::D));
         }
     }
+}
+
+//---------------------------------------------------------
+//   KeySigEvent equality must take the per-keysignature Jianpu tonic
+//   override fields into account, since they are independent of key/mode/custom.
+//---------------------------------------------------------
+TEST_F(Engraving_KeySigTests, jianpuKeySigEventEquality)
+{
+    KeySigEvent a;
+    a.setConcertKey(Key::G);
+    KeySigEvent b = a;
+    EXPECT_TRUE(a == b);
+
+    b.setJianpuNumbering(JianpuTonicMode::CUSTOM);
+    EXPECT_FALSE(a == b);
+    EXPECT_TRUE(a != b);
+
+    KeySigEvent c = a;
+    c.setJianpuTonicKey(Key::D);
+    EXPECT_FALSE(a == c);
+
+    KeySigEvent d = a;
+    d.setJianpuTonicMode(KeyMode::DORIAN);
+    EXPECT_FALSE(a == d);
+}
+
+//---------------------------------------------------------
+//   jianpuKeyMapping should mirror the staff's key/mode when FOLLOW_SCORE_KEY
+//   is selected, and use the explicit override fields when CUSTOM is selected.
+//---------------------------------------------------------
+TEST_F(Engraving_KeySigTests, jianpuKeyMapping)
+{
+    KeySigEvent ks;
+    ks.setConcertKey(Key::D);
+    ks.setMode(KeyMode::DORIAN);
+
+    KeyMode mode;
+    int tonicTpc;
+
+    jianpuKeyMapping(ks, mode, tonicTpc);
+    EXPECT_EQ(mode, KeyMode::DORIAN);
+    EXPECT_EQ(tonicTpc, jianpuTonicTpc(Key::D, KeyMode::DORIAN));
+
+    ks.setJianpuNumbering(JianpuTonicMode::CUSTOM);
+    ks.setJianpuTonicKey(Key::A_B);
+    ks.setJianpuTonicMode(KeyMode::LYDIAN);
+
+    jianpuKeyMapping(ks, mode, tonicTpc);
+    EXPECT_EQ(mode, KeyMode::LYDIAN);
+    EXPECT_EQ(tonicTpc, key2Tpc(Key::A_B));
+}
+
+//---------------------------------------------------------
+//   The three new Jianpu Pids must round-trip through KeySig::setProperty /
+//   getProperty and report the documented defaults via propertyDefault.
+//---------------------------------------------------------
+TEST_F(Engraving_KeySigTests, jianpuKeySigProperties)
+{
+    MasterScore* score = ScoreRW::readScore(KEYSIG_DATA_DIR + u"keysigMode.mscx");
+    EXPECT_TRUE(score);
+    Measure* m1 = score->firstMeasure();
+    KeySig* ke = toKeySig(m1->findSegment(SegmentType::KeySig, m1->tick())->element(0));
+
+    EXPECT_EQ(ke->propertyDefault(Pid::JIANPU_NUMBERING).toInt(), int(JianpuTonicMode::FOLLOW_SCORE_KEY));
+    EXPECT_EQ(Key(ke->propertyDefault(Pid::JIANPU_TONIC_KEY).toInt()), Key::C);
+    EXPECT_EQ(ke->propertyDefault(Pid::JIANPU_TONIC_MODE).value<KeyMode>(), KeyMode::MAJOR);
+
+    EXPECT_EQ(ke->getProperty(Pid::JIANPU_NUMBERING).toInt(), int(JianpuTonicMode::FOLLOW_SCORE_KEY));
+
+    ke->setProperty(Pid::JIANPU_NUMBERING, int(JianpuTonicMode::CUSTOM));
+    ke->setProperty(Pid::JIANPU_TONIC_KEY, int(Key::E_B));
+    ke->setProperty(Pid::JIANPU_TONIC_MODE, KeyMode::PHRYGIAN);
+
+    EXPECT_EQ(ke->getProperty(Pid::JIANPU_NUMBERING).toInt(), int(JianpuTonicMode::CUSTOM));
+    EXPECT_EQ(Key(ke->getProperty(Pid::JIANPU_TONIC_KEY).toInt()), Key::E_B);
+    EXPECT_EQ(ke->getProperty(Pid::JIANPU_TONIC_MODE).value<KeyMode>(), KeyMode::PHRYGIAN);
+
+    delete score;
 }

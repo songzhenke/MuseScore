@@ -46,5 +46,12 @@ enum class Mode {
 };
 
 Q_ENUM_NS(Mode)
+
+enum class JianpuNumbering {
+    FOLLOW_SCORE_KEY = 0,
+    CUSTOM = 1
+};
+
+Q_ENUM_NS(JianpuNumbering)
 }
 }
