@@ -3552,10 +3552,7 @@ void TLayout::layoutKeySig(const KeySig* item, KeySig::LayoutData* ldata, const 
 
     if (staff && staff->isJianpuStaff(item->tick())) {
         // Jianpu staves show a numbering label (e.g. "1=C") in place of the standard ♭/♯ symbols
-        String label;
-        if (jianpuKeyLabel(item->keySigEvent(), label)) {
-            ldata->jianpuLabel = label;
-        }
+        ldata->jianpuLabel = jianpuKeyLabel(item->keySigEvent());
 
         const double height = (st ? st->jianpuBoxH() : spatium) * item->mag();
         double width = 0.0;

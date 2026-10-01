@@ -608,18 +608,14 @@ void jianpuKeyMapping(const KeySigEvent& ks, KeyMode& mode, int& tonicTpc)
 
 //---------------------------------------------------------
 //   jianpuKeyLabel
-//    Computes the Jianpu key-signature label (e.g. "1=C", "6=A"). Returns
-//    false if no label should be shown: Follow-score-key numbering gives no
-//    label for an atonal or unmarked-mode key signature (mode is not guessed
-//    from the music), while Custom numbering always shows a label.
+//    Computes the Jianpu key-signature label (e.g. "1=C", "6=A"). An unset
+//    (UNKNOWN) or atonal (NONE) mode in Follow-score-key numbering falls
+//    back to the same major mapping already used for note digits, since the
+//    key signature alone can't distinguish a major key from its relative minor.
 //---------------------------------------------------------
 
-bool jianpuKeyLabel(const KeySigEvent& ks, String& label)
+String jianpuKeyLabel(const KeySigEvent& ks)
 {
-    if (ks.jianpuNumbering() != JianpuTonicMode::CUSTOM && (ks.mode() == KeyMode::UNKNOWN || ks.mode() == KeyMode::NONE)) {
-        return false;
-    }
-
     KeyMode mode;
     int tonicTpc;
     jianpuKeyMapping(ks, mode, tonicTpc);
@@ -629,8 +625,7 @@ bool jianpuKeyLabel(const KeySigEvent& ks, String& label)
     tonicName.replace(u"b", u"♭");
     tonicName.replace(u"#", u"♯");
 
-    label = String(u"%1=%2").arg(String::number(degree), tonicName);
-    return true;
+    return String(u"%1=%2").arg(String::number(degree), tonicName);
 }
 
 //---------------------------------------------------------
