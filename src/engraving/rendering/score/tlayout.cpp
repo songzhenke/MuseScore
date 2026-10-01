@@ -3539,6 +3539,7 @@ void TLayout::layoutKeySig(const KeySig* item, KeySig::LayoutData* ldata, const 
 
     ldata->setBbox(RectF());
     ldata->keySymbols.clear();
+    ldata->jianpuLabel = String();
 
     const Staff* staff = item->staff();
     const StaffType* stVisibility = staff ? staff->staffType(item->tick()) : nullptr;
@@ -3547,9 +3548,29 @@ void TLayout::layoutKeySig(const KeySig* item, KeySig::LayoutData* ldata, const 
     }
 
     const StaffType* st = item->staffType();
+    double spatium = item->spatium();
+
+    if (staff && staff->isJianpuStaff(item->tick())) {
+        // Jianpu staves show a numbering label (e.g. "1=C") in place of the standard ♭/♯ symbols
+        String label;
+        if (jianpuKeyLabel(item->keySigEvent(), label)) {
+            ldata->jianpuLabel = label;
+        }
+
+        const double height = (st ? st->jianpuBoxH() : spatium) * item->mag();
+        double width = 0.0;
+        if (!ldata->jianpuLabel.isEmpty()) {
+            Font font(st ? st->jianpuFont() : Font());
+            font.setPointSizeF(font.pointSizeF() * item->mag());
+            width = FontMetrics(font).width(ldata->jianpuLabel);
+        }
+        ldata->setPosY(item->staffOffsetY());
+        ldata->setBbox(0.0, -height * 0.5, width, height);
+        return;
+    }
+
     const Segment* s = item->segment();
     track_idx_t track = item->track();
-    double spatium = item->spatium();
     double step = spatium * (st ? st->lineDistance().val() * 0.5 : 0.5);
 
     // determine current clef for this staff

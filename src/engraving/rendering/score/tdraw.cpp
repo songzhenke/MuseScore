@@ -2135,6 +2135,19 @@ void TDraw::draw(const KeySig* item, Painter* painter, const PaintOptions& opt)
     const KeySig::LayoutData* ldata = item->ldata();
 
     painter->setPen(item->curColor(opt));
+
+    if (item->staff() && item->staff()->isJianpuStaff(item->tick())) {
+        if (ldata->jianpuLabel.isEmpty()) {
+            return;
+        }
+        const StaffType* staffType = item->staff()->staffTypeForElement(item);
+        Font f(staffType->jianpuFont());
+        f.setPointSizeF(f.pointSizeF() * item->mag());
+        painter->setFont(f);
+        painter->drawText(PointF(ldata->bbox().x(), ldata->bbox().bottom()), ldata->jianpuLabel);
+        return;
+    }
+
     double _spatium = item->spatium();
     double step = _spatium * (item->staff() ? item->staff()->staffTypeForElement(item)->lineDistance().val() * 0.5 : 0.5);
     int lines = item->staff() ? item->staff()->staffTypeForElement(item)->lines() : 5;

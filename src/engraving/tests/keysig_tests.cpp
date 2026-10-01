@@ -229,6 +229,57 @@ TEST_F(Engraving_KeySigTests, jianpuKeyMapping)
 }
 
 //---------------------------------------------------------
+//   jianpuKeyLabel should produce the "<degree>=<tonic>" label used for the
+//   Jianpu key signature, and suppress the label for Follow-score-key
+//   numbering when the mode is UNKNOWN or NONE (mode is never guessed).
+//---------------------------------------------------------
+TEST_F(Engraving_KeySigTests, jianpuKeyLabel)
+{
+    String label;
+
+    // Follow mode, unmarked major/minor (UNKNOWN): no label
+    KeySigEvent unknown;
+    unknown.setConcertKey(Key::C);
+    EXPECT_FALSE(jianpuKeyLabel(unknown, label));
+
+    // Follow mode, atonal (NONE): no label
+    KeySigEvent atonal;
+    atonal.setConcertKey(Key::C);
+    atonal.setMode(KeyMode::NONE);
+    EXPECT_FALSE(jianpuKeyLabel(atonal, label));
+
+    // Follow mode, C major
+    KeySigEvent cMajor;
+    cMajor.setConcertKey(Key::C);
+    cMajor.setMode(KeyMode::MAJOR);
+    EXPECT_TRUE(jianpuKeyLabel(cMajor, label));
+    EXPECT_EQ(label, u"1=C");
+
+    // Follow mode, A minor (same key signature as C major)
+    KeySigEvent aMinor;
+    aMinor.setConcertKey(Key::C);
+    aMinor.setMode(KeyMode::MINOR);
+    EXPECT_TRUE(jianpuKeyLabel(aMinor, label));
+    EXPECT_EQ(label, u"6=A");
+
+    // Follow mode, C Dorian (relative major is Bb major)
+    KeySigEvent cDorian;
+    cDorian.setConcertKey(Key::B_B);
+    cDorian.setMode(KeyMode::DORIAN);
+    EXPECT_TRUE(jianpuKeyLabel(cDorian, label));
+    EXPECT_EQ(label, u"2=C");
+
+    // Custom numbering always shows a label, regardless of the score's mode
+    KeySigEvent custom;
+    custom.setConcertKey(Key::G);
+    custom.setJianpuNumbering(JianpuTonicMode::CUSTOM);
+    custom.setJianpuTonicKey(Key::C);
+    custom.setJianpuTonicMode(KeyMode::MAJOR);
+    EXPECT_TRUE(jianpuKeyLabel(custom, label));
+    EXPECT_EQ(label, u"1=C");
+}
+
+//---------------------------------------------------------
 //   The three new Jianpu Pids must round-trip through KeySig::setProperty /
 //   getProperty and report the documented defaults via propertyDefault.
 //---------------------------------------------------------

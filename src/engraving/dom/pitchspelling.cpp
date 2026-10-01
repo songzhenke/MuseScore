@@ -607,6 +607,33 @@ void jianpuKeyMapping(const KeySigEvent& ks, KeyMode& mode, int& tonicTpc)
 }
 
 //---------------------------------------------------------
+//   jianpuKeyLabel
+//    Computes the Jianpu key-signature label (e.g. "1=C", "6=A"). Returns
+//    false if no label should be shown: Follow-score-key numbering gives no
+//    label for an atonal or unmarked-mode key signature (mode is not guessed
+//    from the music), while Custom numbering always shows a label.
+//---------------------------------------------------------
+
+bool jianpuKeyLabel(const KeySigEvent& ks, String& label)
+{
+    if (ks.jianpuNumbering() != JianpuTonicMode::CUSTOM && (ks.mode() == KeyMode::UNKNOWN || ks.mode() == KeyMode::NONE)) {
+        return false;
+    }
+
+    KeyMode mode;
+    int tonicTpc;
+    jianpuKeyMapping(ks, mode, tonicTpc);
+
+    const int degree = jianpuModeDegreeOffset(mode) + 1;
+    String tonicName = tpc2name(tonicTpc, NoteSpellingType::STANDARD, NoteCaseType::AUTO);
+    tonicName.replace(u"b", u"♭");
+    tonicName.replace(u"#", u"♯");
+
+    label = String(u"%1=%2").arg(String::number(degree), tonicName);
+    return true;
+}
+
+//---------------------------------------------------------
 //   absStep2pitchByKey
 //    the default pitch for the given absolute step in the given key
 //---------------------------------------------------------
