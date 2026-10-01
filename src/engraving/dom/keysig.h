@@ -102,6 +102,7 @@ public:
 
     struct LayoutData : public EngravingItem::LayoutData {
         std::vector<KeySym> keySymbols;
+        String jianpuLabel;    // Jianpu key label (e.g. "1=C"); drawn instead of keySymbols when non-empty
     };
     DECLARE_LAYOUTDATA_METHODS(KeySig)
 
