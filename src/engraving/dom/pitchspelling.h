@@ -99,6 +99,7 @@ extern int jianpuTonicTpc(Key relativeMajorKey, KeyMode mode);
 extern void tpc2Jianpu(int tpc, int tonicTpc, KeyMode mode, String& accName, String& stepName);
 extern void jianpuKeyMapping(const KeySigEvent& ks, KeyMode& mode, int& tonicTpc);
 extern String jianpuKeyLabel(const KeySigEvent& ks);
+extern String jianpuAccidentalMark(const String& accName);
 extern int tpcInterval(int startTpc, int interval, int alter);
 extern int step2pitchInterval(int step, int alter);
 extern String tpc2Function(int tpc, Key key);

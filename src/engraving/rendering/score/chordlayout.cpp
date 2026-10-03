@@ -2417,6 +2417,7 @@ void ChordLayout::layoutChords1(LayoutContext& ctx, Segment* segment, staff_idx_
 
     const Staff* staff = ctx.dom().staff(staffIdx);
     const bool isTab = staff->isTabStaff(segment->tick());
+    const bool isJianpu = staff->isJianpuStaff(segment->tick());
     const track_idx_t startTrack = staffIdx * VOICES;
     const track_idx_t endTrack   = startTrack + VOICES;
     const Fraction tick = segment->tick();
@@ -2429,7 +2430,9 @@ void ChordLayout::layoutChords1(LayoutContext& ctx, Segment* segment, staff_idx_
     const track_idx_t partStartTrack = partTrackRangeOrDefault.startTrack;
     const track_idx_t partEndTrack = partTrackRangeOrDefault.endTrack;
 
-    if (isTab) {
+    if (isTab || isJianpu) {
+        // Jianpu notes show their accidentals as part of the digit label instead
+        // of the standard Accidental glyph, so skip drawing the latter.
         skipAccidentals(segment, startTrack, endTrack);
     }
 

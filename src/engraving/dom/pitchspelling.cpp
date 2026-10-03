@@ -607,6 +607,20 @@ void jianpuKeyMapping(const KeySigEvent& ks, KeyMode& mode, int& tonicTpc)
 }
 
 //---------------------------------------------------------
+//   jianpuAccidentalMark
+//    Converts the ASCII accidental spelling returned by tpc2Jianpu (e.g.
+//    "#", "bb") into the display form used next to a Jianpu digit.
+//---------------------------------------------------------
+
+String jianpuAccidentalMark(const String& accName)
+{
+    String mark = accName;
+    mark.replace(u"b", u"♭");
+    mark.replace(u"#", u"♯");
+    return mark;
+}
+
+//---------------------------------------------------------
 //   jianpuKeyLabel
 //    Computes the Jianpu key-signature label (e.g. "1=C", "6=A"). An unset
 //    (UNKNOWN) or atonal (NONE) mode in Follow-score-key numbering falls
@@ -622,8 +636,7 @@ String jianpuKeyLabel(const KeySigEvent& ks)
 
     const int degree = jianpuModeDegreeOffset(mode) + 1;
     String tonicName = tpc2name(tonicTpc, NoteSpellingType::STANDARD, NoteCaseType::AUTO);
-    tonicName.replace(u"b", u"♭");
-    tonicName.replace(u"#", u"♯");
+    tonicName = jianpuAccidentalMark(tonicName);
 
     return String(u"%1=%2").arg(String::number(degree), tonicName);
 }
