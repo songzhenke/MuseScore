@@ -2372,7 +2372,7 @@ void TDraw::draw(const MMRestRange* item, Painter* painter, const PaintOptions& 
 //---------------------------------------------------------
 
 static void drawJianpuAccidental(Painter* painter, const Font& digitFont, const FontMetrics& digitFm, const String& accidental,
-                                  double digitStartX, double baselineY)
+                                 double digitStartX, double baselineY)
 {
     if (accidental.isEmpty()) {
         return;
