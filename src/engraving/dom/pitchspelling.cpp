@@ -587,7 +587,7 @@ int pitch2JianpuOctave(int pitch, int tpc, int tonicTpc)
     const int tonicAbsStep = 4 * STEP_DELTA_OCTAVE + tpc2step(tonicTpc);
     const int relativeStep = absStep - tonicAbsStep;
     return relativeStep >= 0 ? relativeStep / STEP_DELTA_OCTAVE
-                             : (relativeStep - STEP_DELTA_OCTAVE + 1) / STEP_DELTA_OCTAVE;
+           : (relativeStep - STEP_DELTA_OCTAVE + 1) / STEP_DELTA_OCTAVE;
 }
 
 int pitch2JianpuOctave(int pitch, int tpc, Key key)

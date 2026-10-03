@@ -369,7 +369,6 @@ TEST_F(Engraving_KeySigTests, jianpuKeyLabel)
     EXPECT_EQ(jianpuKeyLabel(custom), u"1=C");
 }
 
-
 //---------------------------------------------------------
 //   The three new Jianpu Pids must round-trip through KeySig::setProperty /
 //   getProperty and report the documented defaults via propertyDefault.
@@ -436,4 +435,3 @@ TEST_F(Engraving_KeySigTests, jianpuKeyLabelLayout)
 
     delete score;
 }
-
