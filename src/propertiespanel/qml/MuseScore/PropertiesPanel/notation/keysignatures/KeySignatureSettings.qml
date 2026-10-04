@@ -95,7 +95,7 @@ Column {
     }
 
     DropdownPropertyView {
-        titleText: qsTrc("propertiespanel", "Tonal center")
+        titleText: qsTrc("propertiespanel", "Jianpu tonal center")
         propertyItem: root.model ? root.model.jianpuTonicKey : null
         visible: root.model ? root.model.isJianpuStaff : false
 
