@@ -293,6 +293,13 @@ void MeasureLayout::layoutMeasure(MeasureBase* currentMB, LayoutContext& ctx)
                 }
             }
         }
+
+        if (staff->isJianpuStaff(measure->tick())) {
+            // done after all of this measure's segments have been laid out, so a voice's band
+            // position is based on the tallest chord across the whole measure, not just the
+            // current beat (otherwise the band boundary would wobble from beat to beat)
+            ChordLayout::layoutJianpuVoiceOffsets(measure, staffIdx, ctx);
+        }
     }
 
     for (Segment& segment : measure->segments()) {
