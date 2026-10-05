@@ -20,6 +20,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <cfloat>
+#include <map>
 
 #include "chordlayout.h"
 
@@ -45,6 +46,7 @@
 #include "dom/page.h"
 #include "dom/parenthesis.h"
 #include "dom/part.h"
+#include "dom/pitchspelling.h"
 #include "dom/rest.h"
 #include "dom/score.h"
 #include "dom/segment.h"
@@ -1739,7 +1741,7 @@ void ChordLayout::layoutDurationLines(Chord* item, LayoutContext& ctx)
 
     double hw = note->headWidth();
     double hx = note->pos().x() + note->bboxXShift();
-    double lengtheningY = -item->spatium() * .5;
+    double lengtheningY = note->pos().y();
     for (int i = 0; i < lines; ++i) {
         DurationLine* dl = item->durationLines()[i];
         dl->setOwnershipParent(item);
@@ -1775,18 +1777,21 @@ void ChordLayout::layoutOctaveDots(Chord* item, LayoutContext& ctx)
 
     const StaffType* st = staff->staffTypeForElement(item);
     double height = st->jianpuBoxH() * item->magS();
-    int baseOctave = 3; // Default base octave for Jianpu is C3
+    KeySigEvent ks = staff->keySigEvent(tick);
+    [[maybe_unused]] KeyMode mode;
+    int tonicTpc;
+    jianpuKeyMapping(ks, mode, tonicTpc);
 
     for (Note* note : item->notes()) {
         int dots = 0;
         double offsetY = 0;
         double distance = ctx.conf().styleAbsolute(Sid::jianpuOctaveDotDistance) * item->magS();
-        int octave = note->octave();
-        if (octave > baseOctave) {
-            dots = octave - baseOctave;
+        int octave = pitch2JianpuOctave(note->epitch(), note->tpc(), tonicTpc);
+        if (octave > 0) {
+            dots = octave;
             offsetY = -(height * .5 + dots * distance);
-        } else if (octave < baseOctave) {
-            dots = baseOctave - octave;
+        } else if (octave < 0) {
+            dots = -octave;
             offsetY = height * .5 + distance;
             if (note == item->upNote()) {
                 // The octave dot should be under the jianpu beam
@@ -1807,7 +1812,7 @@ void ChordLayout::layoutOctaveDots(Chord* item, LayoutContext& ctx)
             dot->setOwnershipParent(note);
             dot->setTrack(track);
             dot->setVisible(staffVisible);
-            dot->setAbove(octave > baseOctave);
+            dot->setAbove(octave > 0);
             dot->setLen(maxX - minX);
             dot->setPos(minX, offsetY + i * distance);
         }
@@ -2413,6 +2418,7 @@ void ChordLayout::layoutChords1(LayoutContext& ctx, Segment* segment, staff_idx_
 
     const Staff* staff = ctx.dom().staff(staffIdx);
     const bool isTab = staff->isTabStaff(segment->tick());
+    const bool isJianpu = staff->isJianpuStaff(segment->tick());
     const track_idx_t startTrack = staffIdx * VOICES;
     const track_idx_t endTrack   = startTrack + VOICES;
     const Fraction tick = segment->tick();
@@ -2425,7 +2431,9 @@ void ChordLayout::layoutChords1(LayoutContext& ctx, Segment* segment, staff_idx_
     const track_idx_t partStartTrack = partTrackRangeOrDefault.startTrack;
     const track_idx_t partEndTrack = partTrackRangeOrDefault.endTrack;
 
-    if (isTab) {
+    if (isTab || isJianpu) {
+        // Jianpu notes show their accidentals as part of the digit label instead
+        // of the standard Accidental glyph, so skip drawing the latter.
         skipAccidentals(segment, startTrack, endTrack);
     }
 
@@ -2480,6 +2488,140 @@ void ChordLayout::layoutChords1(LayoutContext& ctx, Segment* segment, staff_idx_
         Ornament* ornament = chord->findOrnament();
         if (ornament && ornament->showCueNote()) {
             TLayout::layoutOrnamentCueNote(ornament, ctx);
+        }
+    }
+}
+
+//---------------------------------------------------------
+//   layoutJianpuVoiceOffsets
+//    - Jianpu doesn't use stem direction or staff position to separate voices, so each
+//      voice's number stack (computed independently in layoutPitched) needs to be placed
+//      in its own band, ordered by voice number (voice 1 on top).
+//    - Scoped to a whole measure (rather than per segment) so that a voice's band always
+//      starts at the same absolute height, regardless of how tall another voice's chord
+//      happens to be at any one particular beat (otherwise the band boundary would "wobble"
+//      beat to beat, following whichever beat had the tallest lower-voice chord).
+//---------------------------------------------------------
+
+void ChordLayout::layoutJianpuVoiceOffsets(Measure* measure, staff_idx_t staffIdx, LayoutContext& ctx)
+{
+    // a rest has no notes, so its own position/bbox stands in for a chord's note stack
+    auto itemTop = [](EngravingItem* e) -> double {
+        if (e->isChord()) {
+            double top = DBL_MAX;
+            for (Note* note : toChord(e)->notes()) {
+                top = std::min(top, note->ldata()->pos().y());
+            }
+            return top;
+        }
+        return e->ldata()->pos().y();
+    };
+    auto itemBottom = [](EngravingItem* e) -> double {
+        if (e->isChord()) {
+            double bottom = -DBL_MAX;
+            for (Note* note : toChord(e)->notes()) {
+                bottom = std::max(bottom, note->ldata()->pos().y() + note->ldata()->bbox().height());
+            }
+            return bottom;
+        }
+        return e->ldata()->pos().y() + e->ldata()->bbox().height();
+    };
+    auto shiftItem = [](EngravingItem* e, double dy) {
+        if (e->isChord()) {
+            Chord* chord = toChord(e);
+            for (Note* note : chord->notes()) {
+                note->mutldata()->moveY(dy);
+            }
+            for (Chord* grace : chord->graceNotes()) {
+                for (Note* note : grace->notes()) {
+                    note->mutldata()->moveY(dy);
+                }
+            }
+            // duration lines are positioned relative to the chord, not the note, so they
+            // don't follow the note shift above and need to be moved explicitly
+            for (DurationLine* dl : chord->durationLines()) {
+                dl->mutldata()->moveY(dy);
+            }
+        } else if (e->isRest()) {
+            Rest* rest = toRest(e);
+            rest->mutldata()->moveY(dy);
+            for (DurationLine* dl : rest->durationLines()) {
+                dl->mutldata()->moveY(dy);
+            }
+        }
+    };
+
+    // chord-rests belonging to a given voice, grouped by the segment they occur in
+    std::map<voice_idx_t, std::vector<std::vector<EngravingItem*> > > groupsByVoice;
+    std::map<voice_idx_t, double> maxHeight;
+
+    for (Segment& segment : measure->segments()) {
+        if (!segment.isChordRestType()) {
+            continue;
+        }
+
+        std::map<voice_idx_t, std::vector<EngravingItem*> > itemsByVoiceHere;
+        for (EngravingItem* e : segment.elist()) {
+            if (e && e->isChordRest() && e->vStaffIdx() == staffIdx) {
+                itemsByVoiceHere[e->voice()].push_back(e);
+            }
+        }
+
+        for (auto& pair : itemsByVoiceHere) {
+            double top = DBL_MAX;
+            double bottom = -DBL_MAX;
+            for (EngravingItem* e : pair.second) {
+                top = std::min(top, itemTop(e));
+                bottom = std::max(bottom, itemBottom(e));
+            }
+            if (top == DBL_MAX) {
+                continue;
+            }
+            maxHeight[pair.first] = std::max(maxHeight[pair.first], bottom - top);
+            groupsByVoice[pair.first].push_back(std::move(pair.second));
+        }
+    }
+
+    if (groupsByVoice.size() < 2) {
+        return;
+    }
+
+    // anchor absolute band positions to the topmost voice's natural (unshifted) position
+    double referenceTop = DBL_MAX;
+    for (EngravingItem* e : groupsByVoice.begin()->second.front()) {
+        referenceTop = std::min(referenceTop, itemTop(e));
+    }
+    if (referenceTop == DBL_MAX) {
+        return;
+    }
+
+    const double vDist = ctx.conf().styleAbsolute(Sid::jianpuNumberVerticalDistance);
+    const double voiceGap = vDist * 2.0; // extra breathing room between voices, beyond normal in-chord note spacing
+
+    std::map<voice_idx_t, double> bandTargetTop;
+    double nextTop = referenceTop;
+    for (auto& pair : maxHeight) {
+        bandTargetTop[pair.first] = nextTop;
+        nextTop += pair.second + voiceGap;
+    }
+
+    for (auto& pair : groupsByVoice) {
+        const double targetTop = bandTargetTop.at(pair.first);
+        for (const std::vector<EngravingItem*>& segmentItems : pair.second) {
+            double top = DBL_MAX;
+            for (EngravingItem* e : segmentItems) {
+                top = std::min(top, itemTop(e));
+            }
+            if (top == DBL_MAX) {
+                continue;
+            }
+            const double dy = targetTop - top;
+            if (muse::RealIsNull(dy)) {
+                continue;
+            }
+            for (EngravingItem* e : segmentItems) {
+                shiftItem(e, dy);
+            }
         }
     }
 }
