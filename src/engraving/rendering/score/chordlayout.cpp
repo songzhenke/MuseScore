@@ -1841,15 +1841,11 @@ void ChordLayout::layoutVoiceOffsets(System* system, staff_idx_t staffIdx, Layou
     // voice must be aligned to, so dots on some notes but not others don't throw off the line
     auto itemBaselineTop = [](EngravingItem* e) -> double {
         if (e->isChord()) {
-            double top = DBL_MAX;
-            for (Note* note : toChord(e)->notes()) {
-                top = std::min(top, note->ldata()->pos().y());
-            }
-            return top;
+            Note* upNote = toChord(e)->upNote();
+            return upNote->ldata()->pos().y();
         }
         return e->ldata()->pos().y();
     };
-    // a rest has no notes, so its own position/bbox stands in for a chord's note stack
     auto itemExtentTop = [](EngravingItem* e) -> double {
         if (e->isChord()) {
             double top = DBL_MAX;
@@ -1864,7 +1860,7 @@ void ChordLayout::layoutVoiceOffsets(System* system, staff_idx_t staffIdx, Layou
             }
             return top;
         }
-        return e->ldata()->pos().y();
+        return e->ldata()->pos().y() + e->ldata()->bbox().top();
     };
     auto itemExtentBottom = [&ctx](EngravingItem* e) -> double {
         if (e->isChord()) {
@@ -1890,7 +1886,7 @@ void ChordLayout::layoutVoiceOffsets(System* system, staff_idx_t staffIdx, Layou
             }
             return bottom;
         }
-        return e->ldata()->pos().y() + e->ldata()->bbox().height();
+        return e->ldata()->pos().y() + e->ldata()->bbox().bottom();
     };
     auto shiftItem = [](EngravingItem* e, double dy) {
         if (e->isChord()) {
