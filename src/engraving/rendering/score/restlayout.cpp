@@ -232,7 +232,7 @@ void RestLayout::resolveVerticalRestConflicts(LayoutContext& ctx, Segment* segme
 {
     const Staff* staffForIdx = ctx.dom().staff(staffIdx);
     if (staffForIdx && staffForIdx->isJianpuStaff(segment->tick())) {
-        // jianpu rests are stacked into per-voice bands (see ChordLayout::layoutJianpuVoiceOffsets)
+        // jianpu rests are stacked into per-voice bands (see ChordLayout::layoutVoiceOffsets)
         // instead of using standard notation's notehead/rest shape collision avoidance
         return;
     }

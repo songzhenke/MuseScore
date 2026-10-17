@@ -40,6 +40,7 @@ class Score;
 class Segment;
 class Staff;
 class Slur;
+class System;
 }
 
 namespace mu::engraving::rendering::score {
@@ -102,7 +103,6 @@ public:
     static bool isChordPosBelowTrem(const Chord* item, TremoloTwoChord* trem);
 
     static void layoutChords1(LayoutContext& ctx, Segment* segment, staff_idx_t staffIdx);
-    static void layoutJianpuVoiceOffsets(Measure* measure, staff_idx_t staffIdx, LayoutContext& ctx);
     static double layoutChords2(std::vector<Note*>& notes, bool up, LayoutContext& ctx);
     static void layoutChords3(const std::vector<Chord*>&, const std::vector<Note*>&, const Staff*, LayoutContext& ctx);
     static void layoutLedgerLines(const std::vector<Chord*>& chords, LayoutContext& ctx);
@@ -116,6 +116,7 @@ public:
 
     static void layoutDurationLines(Chord* item, LayoutContext& ctx);
     static void layoutOctaveDots(Chord* item, LayoutContext& ctx);
+    static void layoutVoiceOffsets(System* system, staff_idx_t staffIdx, LayoutContext& ctx);
 
     static void crossMeasureSetup(Chord* chord, bool on, LayoutContext& ctx);
 
