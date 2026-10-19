@@ -82,10 +82,10 @@ using namespace mu::engraving::rendering::score;
 
 static constexpr Spatium STAFFTYPE_TAB_DEFAULTDOTDIST_X = 0.75_sp;
 
-static double jianpuBeamOffset(const Chord* chord, const LayoutContext& ctx)
+static double jianpuBeamOffset(const Chord* chord, PlacementV placement, const LayoutContext& ctx)
 {
     const Beam* beam = chord->beam();
-    if (!beam || ctx.conf().styleV(Sid::jianpuDiminutionBeamPlacement).value<PlacementV>() != PlacementV::BELOW) {
+    if (!beam || ctx.conf().styleV(Sid::jianpuDiminutionBeamPlacement).value<PlacementV>() != placement) {
         return 0.0;
     }
 
@@ -192,7 +192,7 @@ void ChordLayout::layoutPitched(Chord* item, LayoutContext& ctx)
 
             // Add extra offset for beam if it is upnote
             if (note == upnote) {
-                jianpuOffsetY += jianpuBeamOffset(item, ctx);
+                jianpuOffsetY += jianpuBeamOffset(item, PlacementV::BELOW, ctx);
             }
 
             jianpuOffsetY += ldata->bbox().height();
@@ -1791,7 +1791,7 @@ void ChordLayout::layoutOctaveDots(Chord* item, LayoutContext& ctx)
             offsetY = height * .5 + distance;
             if (note == item->upNote()) {
                 // The octave dot should be under the jianpu beam
-                offsetY += jianpuBeamOffset(item, ctx);
+                offsetY += jianpuBeamOffset(item, PlacementV::BELOW, ctx);
             }
         } else {
             note->resizeOctaveDotsTo(0);
@@ -1846,10 +1846,48 @@ void ChordLayout::layoutVoiceOffsets(System* system, staff_idx_t staffIdx, Layou
         }
         return e->ldata()->pos().y();
     };
-    auto itemExtentTop = [](EngravingItem* e) -> double {
+    // slurs are laid out after this pass, so estimate their reach (mirrors slurPos/computeShoulderHeight)
+    auto crSystemX = [system](const ChordRest* cr, bool isStart) -> double {
+        if (cr->measure()->system() != system) {
+            return isStart ? 0.0 : system->width();
+        }
+        return cr->x() + cr->segment()->x() + cr->measure()->x();
+    };
+    auto includeSlurExtents = [&ctx, &crSystemX](Chord* chord, double& top, double& bottom) {
+        std::set<Slur*> slurs;
+        for (Spanner* spanner : chord->startingSpanners()) {
+            if (spanner->isSlur()) {
+                slurs.insert(toSlur(spanner));
+            }
+        }
+        for (Spanner* spanner : chord->endingSpanners()) {
+            if (spanner->isSlur()) {
+                slurs.insert(toSlur(spanner));
+            }
+        }
+
+        const double sp = chord->spatium();
+        for (Slur* slur : slurs) {
+            if (!slur->startCR() || !slur->endCR() || !slur->addToSkyline()) {
+                continue;
+            }
+            SlurTieLayout::computeUp(slur, ctx);
+            const double length = std::max(crSystemX(slur->endCR(), false) - crSystemX(slur->startCR(), true), 0.0);
+            const double arc = 0.75 * std::sqrt(length / sp / 4.0) * sp;
+            const double reach = 0.9 * sp * chord->intrinsicMag() + arc + ctx.conf().styleAbsolute(Sid::slurMidWidth);
+            if (slur->up()) {
+                top -= reach;
+            } else {
+                bottom += reach;
+            }
+        }
+    };
+    auto itemExtentTop = [&ctx, &includeSlurExtents](EngravingItem* e) -> double {
         if (e->isChord()) {
+            Chord* chord = toChord(e);
             double top = DBL_MAX;
-            for (Note* note : toChord(e)->notes()) {
+            double bottom = -DBL_MAX;
+            for (Note* note : chord->notes()) {
                 const double y = note->ldata()->pos().y();
                 top = std::min(top, y + note->ldata()->bbox().top());
                 for (OctaveDot* dot : note->octaveDots()) {
@@ -1858,14 +1896,17 @@ void ChordLayout::layoutVoiceOffsets(System* system, staff_idx_t staffIdx, Layou
                     }
                 }
             }
+            includeSlurExtents(chord, top, bottom);
+            top -= jianpuBeamOffset(chord, PlacementV::ABOVE, ctx);
             return top;
         }
         return e->ldata()->pos().y() + e->ldata()->bbox().top();
     };
-    auto itemExtentBottom = [&ctx](EngravingItem* e) -> double {
+    auto itemExtentBottom = [&ctx, &includeSlurExtents](EngravingItem* e) -> double {
         if (e->isChord()) {
             Chord* chord = toChord(e);
             double bottom = -DBL_MAX;
+            double top = DBL_MAX;
             bool upNoteHasBelowDot = false;
             for (Note* note : chord->notes()) {
                 const double y = note->ldata()->pos().y();
@@ -1879,26 +1920,47 @@ void ChordLayout::layoutVoiceOffsets(System* system, staff_idx_t staffIdx, Layou
                     }
                 }
             }
+            includeSlurExtents(chord, top, bottom);
             // a diminution beam placed below the chord needs extra clearance beneath it, unless
             // the upnote's below-dot is already positioned under the beam (see layoutOctaveDots)
             if (!upNoteHasBelowDot) {
-                bottom += jianpuBeamOffset(chord, ctx);
+                bottom += jianpuBeamOffset(chord, PlacementV::BELOW, ctx);
             }
             return bottom;
         }
         return e->ldata()->pos().y() + e->ldata()->bbox().bottom();
     };
-    auto shiftItem = [](EngravingItem* e, double dy) {
+    std::set<SpannerSegment*> shiftedSlurSegments;
+    auto shiftChordSlurs = [&system, &shiftedSlurSegments](Chord* chord, double dy) {
+        for (const std::set<Spanner*>& spanners : { chord->startingSpanners(), chord->endingSpanners() }) {
+            for (Spanner* spanner : spanners) {
+                if (!spanner->isSlur()) {
+                    continue;
+                }
+                for (SpannerSegment* segment : toSlur(spanner)->spannerSegments()) {
+                    if (segment->system() == system && shiftedSlurSegments.insert(segment).second) {
+                        segment->move(PointF(0.0, dy));
+                    }
+                }
+            }
+        }
+    };
+    auto shiftItem = [&shiftChordSlurs](EngravingItem* e, double dy) {
         if (e->isChord()) {
             Chord* chord = toChord(e);
             for (Note* note : chord->notes()) {
                 note->mutldata()->moveY(dy);
             }
+            shiftChordSlurs(chord, dy);
             for (Chord* grace : chord->graceNotes()) {
                 for (Note* note : grace->notes()) {
                     note->mutldata()->moveY(dy);
                 }
+                shiftChordSlurs(grace, dy);
+                // chord bbox is derived from its shape; slurPos() reads it later
+                fillShape(grace, grace->mutldata());
             }
+            fillShape(chord, chord->mutldata());
             // duration lines are positioned relative to the chord, not the note, so they
             // don't follow the note shift above and need to be moved explicitly
             for (DurationLine* dl : chord->durationLines()) {
@@ -1986,6 +2048,7 @@ void ChordLayout::layoutVoiceOffsets(System* system, staff_idx_t staffIdx, Layou
         firstVoice = false;
     }
 
+    std::set<Segment*> shiftedSegments;
     for (auto& pair : groupsByVoice) {
         const double targetTop = bandTargetTop.at(pair.first);
         for (const std::vector<EngravingItem*>& segmentItems : pair.second) {
@@ -2002,8 +2065,14 @@ void ChordLayout::layoutVoiceOffsets(System* system, staff_idx_t staffIdx, Layou
             }
             for (EngravingItem* e : segmentItems) {
                 shiftItem(e, dy);
+                shiftedSegments.insert(toChordRest(e)->segment());
             }
         }
+    }
+
+    // slur collision avoidance and skylines read the segment staff shape
+    for (Segment* segment : shiftedSegments) {
+        segment->createShape(staffIdx);
     }
 }
 
