@@ -2029,8 +2029,7 @@ void ChordLayout::layoutVoiceOffsets(System* system, staff_idx_t staffIdx, Layou
         return;
     }
 
-    const double vDist = ctx.conf().styleAbsolute(Sid::jianpuNumberVerticalDistance);
-    const double voiceGap = vDist * 2.0; // extra breathing room between voices, beyond normal in-chord note spacing
+    const double voiceDist = ctx.conf().styleAbsolute(Sid::jianpuVoiceVerticalDistance);
 
     // each voice's baseline sits far enough below the previous one to clear both the previous
     // voice's downward extent (dots/beam below) and this voice's own upward extent (dots above)
@@ -2041,7 +2040,7 @@ void ChordLayout::layoutVoiceOffsets(System* system, staff_idx_t staffIdx, Layou
     for (auto& pair : maxAbove) {
         const voice_idx_t voice = pair.first;
         if (!firstVoice) {
-            nextBaseline += prevBelow + voiceGap + pair.second;
+            nextBaseline += prevBelow + voiceDist + pair.second;
         }
         bandTargetTop[voice] = nextBaseline;
         prevBelow = maxBelow.at(voice);
