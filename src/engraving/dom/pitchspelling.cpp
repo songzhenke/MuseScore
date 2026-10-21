@@ -452,6 +452,16 @@ int pitch2absStepByKey(int pitch, int tpc, Key key, int& alter)
     return octave * STEP_DELTA_OCTAVE + step;
 }
 
+int pitch2JianpuOctave(int pitch, int tpc, Key key)
+{
+    int alter;
+    int absStep = pitch2absStepByKey(pitch, tpc, key, alter);
+    int tonicAbsStep = 4 * STEP_DELTA_OCTAVE + tpc2step(key2Tpc(key));
+    int relativeStep = absStep - tonicAbsStep;
+    return relativeStep >= 0 ? relativeStep / STEP_DELTA_OCTAVE
+                             : (relativeStep - STEP_DELTA_OCTAVE + 1) / STEP_DELTA_OCTAVE;
+}
+
 //---------------------------------------------------------
 //   absStep2pitchByKey
 //    the default pitch for the given absolute step in the given key
