@@ -452,40 +452,19 @@ int pitch2absStepByKey(int pitch, int tpc, Key key, int& alter)
     return octave * STEP_DELTA_OCTAVE + step;
 }
 
-static KeyMode normalizedJianpuMode(KeyMode mode)
-{
-    switch (mode) {
-    case KeyMode::DORIAN:
-    case KeyMode::PHRYGIAN:
-    case KeyMode::LYDIAN:
-    case KeyMode::MIXOLYDIAN:
-    case KeyMode::LOCRIAN:
-        return mode;
-    case KeyMode::MINOR:
-    case KeyMode::AEOLIAN:
-        return KeyMode::AEOLIAN;
-    case KeyMode::UNKNOWN:
-    case KeyMode::NONE:
-    case KeyMode::MAJOR:
-    case KeyMode::IONIAN:
-        return KeyMode::IONIAN;
-    }
-    return KeyMode::IONIAN;
-}
-
 static int jianpuModeDegreeOffset(KeyMode mode)
 {
-    switch (normalizedJianpuMode(mode)) {
+    switch (mode) {
     case KeyMode::DORIAN: return 1;
     case KeyMode::PHRYGIAN: return 2;
     case KeyMode::LYDIAN: return 3;
     case KeyMode::MIXOLYDIAN: return 4;
     case KeyMode::AEOLIAN: return 5;
+    case KeyMode::MINOR: return 5;
     case KeyMode::LOCRIAN: return 6;
     case KeyMode::UNKNOWN:
     case KeyMode::NONE:
     case KeyMode::MAJOR:
-    case KeyMode::MINOR:
     case KeyMode::IONIAN:
         return 0;
     }
@@ -502,17 +481,17 @@ static const int* jianpuModeIntervals(KeyMode mode)
     static const int aeolian[] = { 0, 2, 3, 5, 7, 8, 10 };
     static const int locrian[] = { 0, 1, 3, 5, 6, 8, 10 };
 
-    switch (normalizedJianpuMode(mode)) {
+    switch (mode) {
     case KeyMode::DORIAN: return dorian;
     case KeyMode::PHRYGIAN: return phrygian;
     case KeyMode::LYDIAN: return lydian;
     case KeyMode::MIXOLYDIAN: return mixolydian;
     case KeyMode::AEOLIAN: return aeolian;
+    case KeyMode::MINOR: return aeolian;
     case KeyMode::LOCRIAN: return locrian;
     case KeyMode::UNKNOWN:
     case KeyMode::NONE:
     case KeyMode::MAJOR:
-    case KeyMode::MINOR:
     case KeyMode::IONIAN:
         return ionian;
     }
@@ -532,29 +511,22 @@ static int normalizeJianpuAlteration(int alteration)
 
 int jianpuTonicTpc(Key relativeMajorKey, KeyMode mode)
 {
-    // Atonal key signatures have no meaningful tonic to derive; KeyMode::UNKNOWN
-    // (the default for an unmarked major/minor key signature) is treated as major below.
-    if (mode == KeyMode::NONE) {
-        return Tpc::TPC_C;
-    }
-
-    static const int naturalPitchClasses[] = { 0, 2, 4, 5, 7, 9, 11 };
-    static const int majorIntervals[] = { 0, 2, 4, 5, 7, 9, 11 };
+    static const int majorScaleSemitones[] = { 0, 2, 4, 5, 7, 9, 11 };
 
     const int degreeOffset = jianpuModeDegreeOffset(mode);
     const int relativeMajorTpc = key2Tpc(relativeMajorKey);
     const int relativeMajorStep = tpc2step(relativeMajorTpc);
     const int tonicStep = (relativeMajorStep + degreeOffset) % STEP_DELTA_OCTAVE;
-    const int relativeMajorPitch = (naturalPitchClasses[relativeMajorStep] + int(tpc2alter(relativeMajorTpc)) + 12) % 12;
-    const int tonicPitch = (relativeMajorPitch + majorIntervals[degreeOffset]) % 12;
-    const int tonicAlteration = normalizeJianpuAlteration(tonicPitch - naturalPitchClasses[tonicStep]);
+    const int relativeMajorPitch = (majorScaleSemitones[relativeMajorStep] + int(tpc2alter(relativeMajorTpc)) + 12) % 12;
+    const int tonicPitch = (relativeMajorPitch + majorScaleSemitones[degreeOffset]) % 12;
+    const int tonicAlteration = normalizeJianpuAlteration(tonicPitch - majorScaleSemitones[tonicStep]);
 
     return step2tpc(tonicStep, AccidentalVal(tonicAlteration));
 }
 
 void tpc2Jianpu(int tpc, int tonicTpc, KeyMode mode, String& accName, String& stepName)
 {
-    static const int naturalPitchClasses[] = { 0, 2, 4, 5, 7, 9, 11 };
+    static const int majorScaleSemitones[] = { 0, 2, 4, 5, 7, 9, 11 };
     static const String stepNames = u"1234567";
 
     tpc = clampEnharmonic(tpc);
@@ -566,9 +538,9 @@ void tpc2Jianpu(int tpc, int tonicTpc, KeyMode mode, String& accName, String& st
     stepName = stepNames.at(jianpuDegree);
 
     const int* modeIntervals = jianpuModeIntervals(mode);
-    const int tonicPitch = (naturalPitchClasses[tonicStep] + int(tpc2alter(tonicTpc)) + 12) % 12;
+    const int tonicPitch = (majorScaleSemitones[tonicStep] + int(tpc2alter(tonicTpc)) + 12) % 12;
     const int expectedPitch = (tonicPitch + modeIntervals[scaleDegree]) % 12;
-    const int expectedAlteration = normalizeJianpuAlteration(expectedPitch - naturalPitchClasses[noteStep]);
+    const int expectedAlteration = normalizeJianpuAlteration(expectedPitch - majorScaleSemitones[noteStep]);
     const int alteration = int(tpc2alter(tpc)) - expectedAlteration;
 
     accName = String();
@@ -578,21 +550,22 @@ void tpc2Jianpu(int tpc, int tonicTpc, KeyMode mode, String& accName, String& st
     }
 }
 
-int pitch2JianpuOctave(int pitch, int tpc, int tonicTpc)
+int pitch2JianpuOctave(int pitch, int tpc, int tonicTpc, KeyMode mode)
 {
     tonicTpc = clampEnharmonic(tonicTpc);
     tpc = clampEnharmonic(tpc);
     const int noteOctave = (clampPitchOctaved(pitch) - int(tpc2alter(tpc))) / PITCH_DELTA_OCTAVE;
     const int absStep = noteOctave * STEP_DELTA_OCTAVE + tpc2step(tpc);
     const int tonicAbsStep = 4 * STEP_DELTA_OCTAVE + tpc2step(tonicTpc);
-    const int relativeStep = absStep - tonicAbsStep;
+    const int degreeOneOffset = (STEP_DELTA_OCTAVE - jianpuModeDegreeOffset(mode)) % STEP_DELTA_OCTAVE;
+    const int relativeStep = absStep - tonicAbsStep - degreeOneOffset;
     return relativeStep >= 0 ? relativeStep / STEP_DELTA_OCTAVE
            : (relativeStep - STEP_DELTA_OCTAVE + 1) / STEP_DELTA_OCTAVE;
 }
 
-int pitch2JianpuOctave(int pitch, int tpc, Key key)
+int pitch2JianpuOctave(int pitch, int tpc, Key key, KeyMode mode)
 {
-    return pitch2JianpuOctave(pitch, tpc, key2Tpc(key));
+    return pitch2JianpuOctave(pitch, tpc, key2Tpc(key), mode);
 }
 
 void jianpuKeyMapping(const KeySigEvent& ks, KeyMode& mode, int& tonicTpc)

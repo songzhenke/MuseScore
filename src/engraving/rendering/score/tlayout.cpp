@@ -4889,7 +4889,7 @@ void TLayout::layoutShadowNote(ShadowNote* item, LayoutContext& ctx)
 
                     Interval transpose = item->part()->instrument(item->tick())->transpose();
                     int epitch = nval.pitch - transpose.chromatic;
-                    dots = -pitch2JianpuOctave(epitch, tpc, tonicTpc);
+                    dots = -pitch2JianpuOctave(epitch, tpc, tonicTpc, mode);
                 }
             }
         }
