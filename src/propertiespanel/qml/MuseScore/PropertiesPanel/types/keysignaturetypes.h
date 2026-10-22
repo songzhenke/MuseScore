@@ -48,8 +48,8 @@ enum class Mode {
 Q_ENUM_NS(Mode)
 
 enum class JianpuNumbering {
-    FOLLOW_SCORE_KEY = 0,
-    CUSTOM = 1
+    FOLLOW_SCORE_KEY = int(engraving::JianpuTonicMode::FOLLOW_SCORE_KEY),
+    CUSTOM = int(engraving::JianpuTonicMode::CUSTOM)
 };
 
 Q_ENUM_NS(JianpuNumbering)
