@@ -1272,7 +1272,7 @@ void TDraw::draw(const DurationLine* item, Painter* painter, const PaintOptions&
     }
 
     painter->setPen(Pen(item->curColor(opt), ldata->lineWidth, PenStyle::SolidLine, PenCapStyle::FlatCap));
-    painter->drawLine(LineF(0.0, 0.0, item->len(), 0.0));
+    painter->drawLine(LineF(0.0, 0.0, ldata->len, 0.0));
 }
 
 void TDraw::draw(const Expression* item, Painter* painter, const PaintOptions& opt)
@@ -2526,7 +2526,7 @@ void TDraw::draw(const OctaveDot* item, Painter* painter, const PaintOptions& op
     }
 
     double rad = ldata->radius;
-    double x = item->len() * 0.5; // draw dot in the middle
+    double x = ldata->len * 0.5; // draw dot in the middle
 
     painter->setPen(Pen(item->curColor(opt)));
     painter->setBrush(Brush(item->curColor(opt)));

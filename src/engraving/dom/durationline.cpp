@@ -66,17 +66,6 @@ PointF DurationLine::pagePos() const
 }
 
 //---------------------------------------------------------
-//   spatiumChanged
-//---------------------------------------------------------
-
-void DurationLine::spatiumChanged(double oldValue, double newValue)
-{
-    if (oldValue != 0.0) {
-        m_len = (m_len / oldValue) * newValue;
-    }
-}
-
-//---------------------------------------------------------
 //   mag
 //---------------------------------------------------------
 

@@ -51,23 +51,12 @@ public:
 
     Note* note() const;
 
-    double len() const { return m_len; }
-    void setLen(double v) { m_len = v; }
-
-    bool above() const { return m_above; }
-    void setAbove(bool v) { m_above = v; }
-
-    void spatiumChanged(double /*oldValue*/, double /*newValue*/) override;
-
     struct LayoutData : public EngravingItem::LayoutData {
         double radius = 0.0;
+        double len = 0.0;
+        bool above = false;
     };
     DECLARE_LAYOUTDATA_METHODS(OctaveDot);
-
-private:
-
-    double m_len = 0.0;
-    bool m_above = false;
 };
 } // namespace mu::engraving
 #endif

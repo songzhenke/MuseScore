@@ -218,7 +218,7 @@ void RestLayout::layoutRestForJianpu(const Rest* item, Rest::LayoutData* ldata, 
             dl->setOwnershipParent(const_cast<Rest*>(item));
             dl->setTrack(track);
             dl->setVisible(staffVisible);
-            dl->setLen(width);
+            dl->mutldata()->len = width;
             dl->setPos(hx + width * 1.2 * (i + 1), hy);
         }
 

@@ -43,17 +43,6 @@ OctaveDot::OctaveDot(DummyParentOr<Note> parent)
 }
 
 //---------------------------------------------------------
-//   spatiumChanged
-//---------------------------------------------------------
-
-void OctaveDot::spatiumChanged(double oldValue, double newValue)
-{
-    if (oldValue != 0.0) {
-        m_len = (m_len / oldValue) * newValue;
-    }
-}
-
-//---------------------------------------------------------
 //   note
 //---------------------------------------------------------
 

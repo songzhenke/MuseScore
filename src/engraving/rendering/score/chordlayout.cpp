@@ -178,7 +178,7 @@ void ChordLayout::layoutPitched(Chord* item, LayoutContext& ctx)
             const double dotDistance = ctx.conf().styleAbsolute(Sid::jianpuOctaveDotDistance) * itemMag;
 
             // Move the current note down if it is has octave dots above it
-            if (note != upnote && !dots.empty() && dots.back()->above()) {
+            if (note != upnote && !dots.empty() && dots.back()->ldata()->above) {
                 jianpuOffsetY += dots.size() * dotDistance;
             }
 
@@ -186,7 +186,7 @@ void ChordLayout::layoutPitched(Chord* item, LayoutContext& ctx)
             ldata->moveY(jianpuOffsetY);
 
             // Move the next note down if current note has octave dots in below
-            if (!dots.empty() && !dots.back()->above()) {
+            if (!dots.empty() && !dots.back()->ldata()->above) {
                 jianpuOffsetY += dots.size() * dotDistance;
             }
 
@@ -1743,7 +1743,7 @@ void ChordLayout::layoutDurationLines(Chord* item, LayoutContext& ctx)
         dl->setOwnershipParent(item);
         dl->setTrack(track);
         dl->setVisible(staffVisible);
-        dl->setLen(hw);
+        dl->mutldata()->len = hw;
         dl->setPos(hx + hw * 1.2 * (i + 1), lengtheningY);
     }
 
@@ -1808,8 +1808,8 @@ void ChordLayout::layoutOctaveDots(Chord* item, LayoutContext& ctx)
             dot->setOwnershipParent(note);
             dot->setTrack(track);
             dot->setVisible(staffVisible);
-            dot->setAbove(octave > 0);
-            dot->setLen(maxX - minX);
+            dot->mutldata()->above = octave > 0;
+            dot->mutldata()->len = maxX - minX;
             dot->setPos(minX, offsetY + i * distance);
         }
 
@@ -1891,7 +1891,7 @@ void ChordLayout::layoutVoiceOffsets(System* system, staff_idx_t staffIdx, Layou
                 const double y = note->ldata()->pos().y();
                 top = std::min(top, y + note->ldata()->bbox().top());
                 for (OctaveDot* dot : note->octaveDots()) {
-                    if (dot->above()) {
+                    if (dot->ldata()->above) {
                         top = std::min(top, y + dot->ldata()->pos().y() + dot->ldata()->bbox().top());
                     }
                 }
@@ -1912,7 +1912,7 @@ void ChordLayout::layoutVoiceOffsets(System* system, staff_idx_t staffIdx, Layou
                 const double y = note->ldata()->pos().y();
                 bottom = std::max(bottom, y + note->ldata()->bbox().bottom());
                 for (OctaveDot* dot : note->octaveDots()) {
-                    if (!dot->above()) {
+                    if (!dot->ldata()->above) {
                         bottom = std::max(bottom, y + dot->ldata()->pos().y() + dot->ldata()->bbox().bottom());
                         if (note == chord->upNote()) {
                             upNoteHasBelowDot = true;

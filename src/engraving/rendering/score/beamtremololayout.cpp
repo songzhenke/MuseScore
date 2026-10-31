@@ -677,7 +677,7 @@ bool BeamTremoloLayout::calculateAnchors(const BeamBase* item, BeamBase::LayoutD
             const Chord* chord = chordRest->isChord() ? toChord(chordRest) : nullptr;
             if (chord) {
                 const std::vector<OctaveDot*>& dots = chord->upNote()->octaveDots();
-                if (!dots.empty() && dots.front()->above()) {
+                if (!dots.empty() && dots.front()->ldata()->above) {
                     aboveDots = static_cast<int>(dots.size());
                 }
             }
