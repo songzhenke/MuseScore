@@ -184,7 +184,7 @@ void RestLayout::layoutRestForJianpu(const Rest* item, Rest::LayoutData* ldata, 
     if (!measure) {
         return;
     }
-    Fraction tick = measure->ticks();
+    Fraction tick = measure->tick();
     const Staff* staff = item->staff();
     const StaffType* st = staff->staffTypeForElement(item);
 
