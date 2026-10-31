@@ -538,7 +538,7 @@ void TLayout::layoutAccidental(const Accidental* item, Accidental::LayoutData* l
     // TODO: remove Accidental in layout
     // don't show accidentals for tab or slash notation; Jianpu shows its
     // accidental as part of the digit label instead of this glyph
-    if (item->onTabStaff() || item->isJianpuStaff() || (item->note() && item->note()->fixed())) {
+    if (item->onTabStaff() || item->onJianpuStaff() || (item->note() && item->note()->fixed())) {
         ldata->setIsSkipDraw(true);
         return;
     }

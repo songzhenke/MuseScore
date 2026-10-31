@@ -144,9 +144,9 @@ void ChordLayout::layoutPitched(Chord* item, LayoutContext& ctx)
     // https://github.com/musescore/MuseScore/issues/8970
     std::vector<Accidental*> chordAccidentals;
 
-    const bool isJianpuStaff = item->isJianpuStaff();
+    const bool isJianpuStaff = item->onJianpuStaff();
 
-    auto notes = item->notes();
+    std::vector<Note*> notes = item->notes();
     if (isJianpuStaff) {
         std::sort(notes.begin(), notes.end(), [](const Note* n1, const Note* n2) {
             return noteIsBefore(n2, n1); // highest pitch on top
@@ -170,7 +170,7 @@ void ChordLayout::layoutPitched(Chord* item, LayoutContext& ctx)
         TLayout::layoutNote(note, ldata);
 
         if (isJianpuStaff) {
-            std::vector<OctaveDot*> dots = note->octaveDots();
+            const std::vector<OctaveDot*>& dots = note->octaveDots();
             // Jianpu spacing rules for octave dots, beams, and notes:
             // - Dot-to-note uses dot centerline to note boundary distance.
             // - Beam-to-note uses beam centerline to note boundary distance.

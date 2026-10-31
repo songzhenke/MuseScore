@@ -2437,7 +2437,7 @@ void TDraw::draw(const Note* item, Painter* painter, const PaintOptions& opt)
         painter->drawText(PointF(startPosX, yOffset * item->magS()), item->fretString());
     }
     // Jianpu
-    else if (staffType && item->isJianpuStaff()) {
+    else if (staffType && item->onJianpuStaff()) {
         Font f(staffType->jianpuFont());
         f.setPointSizeF(f.pointSizeF() * item->magS());
         painter->setFont(f);
