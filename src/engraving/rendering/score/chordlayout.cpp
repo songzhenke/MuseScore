@@ -148,9 +148,7 @@ void ChordLayout::layoutPitched(Chord* item, LayoutContext& ctx)
 
     std::vector<Note*> notes = item->notes();
     if (isJianpuStaff) {
-        std::sort(notes.begin(), notes.end(), [](const Note* n1, const Note* n2) {
-            return noteIsBefore(n2, n1); // highest pitch on top
-        });
+        std::reverse(notes.begin(), notes.end()); // highest pitch on top
     }
 
     // Jianpu Y origin is at the center of the number.
@@ -1779,15 +1777,13 @@ void ChordLayout::layoutOctaveDots(Chord* item, LayoutContext& ctx)
     jianpuKeyMapping(ks, mode, tonicTpc);
 
     for (Note* note : item->notes()) {
-        int dots = 0;
+        const double distance = ctx.conf().styleAbsolute(Sid::jianpuOctaveDotDistance) * item->magS();
+        const int octave = pitch2JianpuOctave(note->epitch(), note->tpc(), tonicTpc, mode);
+        const int dots = abs(octave);
         double offsetY = 0;
-        double distance = ctx.conf().styleAbsolute(Sid::jianpuOctaveDotDistance) * item->magS();
-        int octave = pitch2JianpuOctave(note->epitch(), note->tpc(), tonicTpc, mode);
         if (octave > 0) {
-            dots = octave;
             offsetY = -(height * .5 + dots * distance);
         } else if (octave < 0) {
-            dots = -octave;
             offsetY = height * .5 + distance;
             if (note == item->upNote()) {
                 // The octave dot should be under the jianpu beam
