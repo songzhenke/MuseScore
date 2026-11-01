@@ -3301,7 +3301,7 @@ static const std::array<Item<StaffTypes>, 28> STAFFTYPES_ITEMS = { {
     { StaffTypes::TAB_8SIMPLE,   "tab8StrSimple",  muse::TranslatableString("engraving/stafftypes", "Tab. 8-str. simple") },
     { StaffTypes::TAB_9SIMPLE,   "tab9StrSimple",  muse::TranslatableString("engraving/stafftypes", "Tab. 9-str. simple") },
     { StaffTypes::TAB_10SIMPLE,  "tab10StrSimple", muse::TranslatableString("engraving/stafftypes", "Tab. 10-str. simple") },
-    { StaffTypes::JIANPU,        "stdJianpu",      muse::TranslatableString("engraving/stafftypes", "Jianpu") },
+    { StaffTypes::JIANPU,        "jianpu",         muse::TranslatableString("engraving/stafftypes", "Jianpu") },
 } };
 
 const TranslatableString& TConv::userName(StaffTypes v)

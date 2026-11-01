@@ -74,7 +74,7 @@
       <Staff>
         <eid>A_B</eid>
         <StaffType group="jianpu">
-          <name>stdJianpu</name>
+          <name>jianpu</name>
           <lines>0</lines>
           <jianpuTextStyle>jianpu_number</jianpuTextStyle>
           </StaffType>
