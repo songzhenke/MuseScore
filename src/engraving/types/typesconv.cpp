@@ -3251,10 +3251,11 @@ MarkerType TConv::fromXml(const AsciiStringView& tag, MarkerType def)
     return def;
 }
 
-static const std::array<Item<StaffGroup>, 3> STAFFGROUP_TYPES = { {
+static const std::array<Item<StaffGroup>, 4> STAFFGROUP_TYPES = { {
     { StaffGroup::STANDARD,     "pitched",    muse::TranslatableString("engraving/staffgroup", "Standard") },
     { StaffGroup::PERCUSSION,   "percussion", muse::TranslatableString("engraving/staffgroup", "Percussion") },
     { StaffGroup::TAB,          "tablature",  muse::TranslatableString("engraving/staffgroup", "Tablature") },
+    { StaffGroup::JIANPU,       "jianpu",     muse::TranslatableString("engraving/staffgroup", "Jianpu") },
 } };
 
 String TConv::translatedUserName(StaffGroup v)
@@ -3274,7 +3275,6 @@ StaffGroup TConv::fromXml(const AsciiStringView& tag, StaffGroup def)
 
 static const std::array<Item<StaffTypes>, 28> STAFFTYPES_ITEMS = { {
     { StaffTypes::STANDARD,      "stdNormal",      muse::TranslatableString("engraving/stafftypes", "Standard") },
-    { StaffTypes::JIANPU,        "stdJianpu",      muse::TranslatableString("engraving/stafftypes", "Jianpu") },
     { StaffTypes::PERC_1LINE,    "perc1Line",      muse::TranslatableString("engraving/stafftypes", "Perc. 1 line") },
     { StaffTypes::PERC_2LINE,    "perc2Line",      muse::TranslatableString("engraving/stafftypes", "Perc. 2 lines") },
     { StaffTypes::PERC_3LINE,    "perc3Line",      muse::TranslatableString("engraving/stafftypes", "Perc. 3 lines") },
@@ -3301,6 +3301,7 @@ static const std::array<Item<StaffTypes>, 28> STAFFTYPES_ITEMS = { {
     { StaffTypes::TAB_8SIMPLE,   "tab8StrSimple",  muse::TranslatableString("engraving/stafftypes", "Tab. 8-str. simple") },
     { StaffTypes::TAB_9SIMPLE,   "tab9StrSimple",  muse::TranslatableString("engraving/stafftypes", "Tab. 9-str. simple") },
     { StaffTypes::TAB_10SIMPLE,  "tab10StrSimple", muse::TranslatableString("engraving/stafftypes", "Tab. 10-str. simple") },
+    { StaffTypes::JIANPU,        "stdJianpu",      muse::TranslatableString("engraving/stafftypes", "Jianpu") },
 } };
 
 const TranslatableString& TConv::userName(StaffTypes v)

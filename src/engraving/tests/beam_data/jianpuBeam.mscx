@@ -73,7 +73,7 @@
       <eid>d_d</eid>
       <Staff>
         <eid>A_B</eid>
-        <StaffType group="pitched">
+        <StaffType group="jianpu">
           <name>stdJianpu</name>
           <lines>0</lines>
           <jianpuTextStyle>jianpu_number</jianpuTextStyle>

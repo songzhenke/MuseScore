@@ -3117,7 +3117,7 @@ void TWrite::write(const StaffType* item, XmlWriter& xml, WriteContext& ctx)
     if (item->color() != ctx.configuration()->defaultColor()) {
         xml.tagProperty(Pid::COLOR, item->color());
     }
-    if (item->group() == StaffGroup::STANDARD) {
+    if (item->group() == StaffGroup::STANDARD || item->group() == StaffGroup::JIANPU) {
         xml.tag("noteheadScheme", TConv::toXml(item->noteHeadScheme()), TConv::toXml(NoteHeadScheme::HEAD_NORMAL));
         if (item->xmlName() == u"stdJianpu") {
             xml.tag("jianpuTextStyle", TConv::toXml(item->jianpuTextStyle()));
@@ -3125,7 +3125,7 @@ void TWrite::write(const StaffType* item, XmlWriter& xml, WriteContext& ctx)
     }
     xml.tag("instrumentLabelVisibility", TConv::toXml(item->instrumentLabelVisibility()),
             TConv::toXml(InstrumentLabelVisibility::AUTO));
-    if (item->group() == StaffGroup::STANDARD || item->group() == StaffGroup::PERCUSSION) {
+    if (item->group() == StaffGroup::STANDARD || item->group() == StaffGroup::JIANPU || item->group() == StaffGroup::PERCUSSION) {
         if (!item->genKeysig()) {
             xml.tag("keysig", item->genKeysig());
         }
