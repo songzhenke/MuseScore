@@ -1760,6 +1760,8 @@ KeyMode TConv::fromXml(const AsciiStringView& tag, KeyMode def)
 static const std::vector<Item<JianpuNumbering> > JIANPU_NUMBERINGS = {
     { JianpuNumbering::FOLLOW_SCORE_KEY, "followScoreKey" },
     { JianpuNumbering::CUSTOM,           "custom" },
+    { JianpuNumbering::FOLLOW_SCORE_KEY, "0" },
+    { JianpuNumbering::CUSTOM,           "1" },
 };
 
 AsciiStringView TConv::toXml(JianpuNumbering v)
@@ -1789,6 +1791,21 @@ static const std::vector<Item<Key> > KEYS = {
     { Key::B,   "B" },
     { Key::F_S, "F#" },
     { Key::C_S, "C#" },
+    { Key::C_B,  "-7" },
+    { Key::G_B,  "-6" },
+    { Key::D_B,  "-5" },
+    { Key::A_B,  "-4" },
+    { Key::E_B,  "-3" },
+    { Key::B_B,  "-2" },
+    { Key::F,    "-1" },
+    { Key::C,    "0" },
+    { Key::G,    "1" },
+    { Key::D,    "2" },
+    { Key::A,    "3" },
+    { Key::E,    "4" },
+    { Key::B,    "5" },
+    { Key::F_S,  "6" },
+    { Key::C_S,  "7" },
 };
 
 AsciiStringView TConv::toXml(Key v)
@@ -3365,6 +3382,10 @@ AsciiStringView TConv::toXml(StaffTypes v)
 
 StaffTypes TConv::fromXml(const AsciiStringView& tag, StaffTypes def)
 {
+    if (tag == "stdJianpu") {
+        return StaffTypes::JIANPU;
+    }
+
     return findTypeByXmlTag<StaffTypes>(STAFFTYPES_ITEMS, tag, def);
 }
 
