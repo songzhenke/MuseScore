@@ -2307,9 +2307,9 @@ void TWrite::write(const KeySig* item, XmlWriter& xml, WriteContext& ctx)
         xml.tag("mode", TConv::toXml(item->mode()));
     }
 
-    if (item->jianpuNumbering() != JianpuTonicMode::FOLLOW_SCORE_KEY) {
-        xml.tag("jianpuNumbering", int(item->jianpuNumbering()));
-        xml.tag("jianpuTonicKey", int(item->jianpuTonicKey()));
+    if (item->jianpuNumbering() != JianpuNumbering::FOLLOW_SCORE_KEY) {
+        xml.tag("jianpuNumbering", TConv::toXml(item->jianpuNumbering()));
+        xml.tag("jianpuTonicKey", TConv::toXml(item->jianpuTonicKey()));
         xml.tag("jianpuTonicMode", TConv::toXml(item->jianpuTonicMode()));
     }
 

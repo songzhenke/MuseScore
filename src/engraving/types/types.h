@@ -1186,7 +1186,7 @@ enum class CourtesyBarlineMode : char {
 };
 
 // How the tonic ("1") of a Jianpu staff is determined
-enum class JianpuTonicMode : char {
+enum class JianpuNumbering : char {
     FOLLOW_SCORE_KEY = 0,     // tonic follows the actual key signature
     CUSTOM           = 1      // tonic and mode are selected independently
 };

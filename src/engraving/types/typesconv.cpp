@@ -1757,6 +1757,50 @@ KeyMode TConv::fromXml(const AsciiStringView& tag, KeyMode def)
     return findTypeByXmlTag<KeyMode>(KEY_MODES, tag, def);
 }
 
+static const std::vector<Item<JianpuNumbering> > JIANPU_NUMBERINGS = {
+    { JianpuNumbering::FOLLOW_SCORE_KEY, "followScoreKey" },
+    { JianpuNumbering::CUSTOM,           "custom" },
+};
+
+AsciiStringView TConv::toXml(JianpuNumbering v)
+{
+    return findXmlTagByType(JIANPU_NUMBERINGS, v);
+}
+
+JianpuNumbering TConv::fromXml(const AsciiStringView& tag, JianpuNumbering def)
+{
+    return findTypeByXmlTag(JIANPU_NUMBERINGS, tag, def);
+}
+
+static const std::vector<Item<Key> > KEYS = {
+    { Key::INVALID, "invalid" },
+    { Key::C_B, "Cb" },
+    { Key::G_B, "Gb" },
+    { Key::D_B, "Db" },
+    { Key::A_B, "Ab" },
+    { Key::E_B, "Eb" },
+    { Key::B_B, "Bb" },
+    { Key::F,   "F" },
+    { Key::C,   "C" },
+    { Key::G,   "G" },
+    { Key::D,   "D" },
+    { Key::A,   "A" },
+    { Key::E,   "E" },
+    { Key::B,   "B" },
+    { Key::F_S, "F#" },
+    { Key::C_S, "C#" },
+};
+
+AsciiStringView TConv::toXml(Key v)
+{
+    return findXmlTagByType(KEYS, v);
+}
+
+Key TConv::fromXml(const AsciiStringView& tag, Key def)
+{
+    return findTypeByXmlTag(KEYS, tag, def);
+}
+
 static const std::vector<Item<TextStyleType> > TEXTSTYLE_TYPES = {
     { TextStyleType::DEFAULT,           "default",              muse::TranslatableString("engraving", "Default") },
     { TextStyleType::TITLE,             "title",                muse::TranslatableString("engraving", "Title") },
