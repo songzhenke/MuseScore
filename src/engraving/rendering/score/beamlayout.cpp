@@ -313,8 +313,9 @@ void BeamLayout::layout2(Beam* item, const LayoutContext& ctx, const std::vector
     if (chordRests.empty()) {
         return;
     }
+    bool isJianpuStaff = item->onJianpuStaff();
     for (ChordRest* chordRest : chordRests) {
-        if (chordRest->isChord() || chordRest->onJianpuStaff()) {
+        if (chordRest->isChord() || isJianpuStaff) {
             if (!startCr) {
                 startCr = chordRest;
                 endCr = startCr;
@@ -328,7 +329,7 @@ void BeamLayout::layout2(Beam* item, const LayoutContext& ctx, const std::vector
         }
     }
     if (!startCr) {
-        // we were passed a vector of only rests. we don't support beams across only rests
+        // we were passed a vector of only rests. we don't support beams across only rests except on Jianpu staves
         // this beam will be deleted in LayoutBeams
         return;
     }
@@ -347,7 +348,7 @@ void BeamLayout::layout2(Beam* item, const LayoutContext& ctx, const std::vector
         item->setBeamWidth(item->beamWidth() * graceScale);
     }
 
-    if (item->onJianpuStaff()) {
+    if (isJianpuStaff) {
         item->setBeamWidth(ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamThickness) * item->mag() * graceScale);
         item->setBeamDist(ctx.conf().styleAbsolute(Sid::jianpuDiminutionBeamDistance) * item->mag() * graceScale);
     }
@@ -376,7 +377,7 @@ void BeamLayout::layout2(Beam* item, const LayoutContext& ctx, const std::vector
     // anchor represents the middle of the beam, not the tip of the stem
     // location depends on _isBesideTabStaff
 
-    if (item->onJianpuStaff()) {
+    if (isJianpuStaff) {
         BeamTremoloLayout::setupLData(item, item->mutldata(), ctx);
         BeamTremoloLayout::calculateAnchors(item, item->mutldata(), ctx, chordRests, item->notePositions());
         item->setStartAnchor(item->ldata()->startAnchor);
