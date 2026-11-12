@@ -36,348 +36,961 @@ using muse::rcommand::Presence;
 using muse::rcommand::Availability;
 using muse::rcommand::Annotation;
 using muse::rcommand::Decoration;
-
-// A few typed commands as an example. Eventually, all commands should be made typed.
-
-#define sci_auto static const inline auto
-#define sce_auto static constexpr auto
+using muse::rcommand::Checkable;
 
 // select commands
-struct SelectTargetCommand {
-    sci_auto id = Command("command://notation/select/target");
-    sci_auto title = MnemonicString("action", "Select");
-    sci_auto description = TranslatableString("action", "Select items by target");
-    sci_auto availabilities = Availability::API;
-    sci_auto annotations = Annotation::Idempotent;
+struct SelectCommand {
+    cprop_decl id = Command("command://notation/select");
+    cprop_decl title = MnemonicString("action", "Select");
+    cprop_decl description = TranslatableString("action", "Select items by target");
+    cprop_decl availabilities = Availability::API;
+    cprop_decl annotations = Annotation::None;
 
     SelectionTarget target = SelectionTarget::FirstItem;
     PlayMode playMode = PlayMode::NoPlay;
 
-    sce_auto input = FieldsScheme {
-        Field{ "target", &SelectTargetCommand::target, "Selection target" },
-        Field{ "play-mode", &SelectTargetCommand::playMode, "Play mode", Presence::Optional },
+    cprop_decl input = FieldsScheme {
+        Field{ "target", &SelectCommand::target, "Selection target" },
+        Field{ "play-mode", &SelectCommand::playMode, "Play mode", Presence::Optional },
     };
 };
 
 // aliases for select command
 struct SelectFirstItemCommand {
-    sci_auto id = Command("command://notation/select/first-item");
-    sci_auto title = MnemonicString("action", "First element");
-    sci_auto description = TranslatableString("action", "Go to first element in score");
-    sci_auto availabilities = Availability::UI;
-    sci_auto annotations = Annotation::Idempotent;
+    cprop_decl id = Command("command://notation/select/first-item");
+    cprop_decl title = MnemonicString("action", "First element");
+    cprop_decl description = TranslatableString("action", "Go to first element in score");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::FirstItem, PlayMode::PlayChord);
 };
 
 struct SelectLastItemCommand {
-    sci_auto id = Command("command://notation/select/last-item");
-    sci_auto title = MnemonicString("action", "Last element");
-    sci_auto description = TranslatableString("action", "Go to last element in score");
-    sci_auto availabilities = Availability::UI;
-    sci_auto annotations = Annotation::Idempotent;
+    cprop_decl id = Command("command://notation/select/last-item");
+    cprop_decl title = MnemonicString("action", "Last element");
+    cprop_decl description = TranslatableString("action", "Go to last element in score");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::LastItem, PlayMode::PlayChord);
 };
 
 struct SelectNextItemCommand {
-    sci_auto id = Command("command://notation/select/next-item");
-    sci_auto title = MnemonicString("action", "Next element");
-    sci_auto description = TranslatableString("action", "Select next element in score");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/select/next-item");
+    cprop_decl title = MnemonicString("action", "Next element");
+    cprop_decl description = TranslatableString("action", "Select next element in score");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::NextItem, PlayMode::PlayNote);
 };
 
 struct SelectPrevItemCommand {
-    sci_auto id = Command("command://notation/select/prev-item");
-    sci_auto title = MnemonicString("action", "Previous element");
-    sci_auto description = TranslatableString("action", "Select previous element in score");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/select/prev-item");
+    cprop_decl title = MnemonicString("action", "Previous element");
+    cprop_decl description = TranslatableString("action", "Select previous element in score");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::PrevItem, PlayMode::PlayNote);
 };
 
 struct SelectNextSegmentCommand {
-    sci_auto id = Command("command://notation/select/next-segment");
-    sci_auto title = MnemonicString("action", "Next segment element");
-    sci_auto description = TranslatableString("action", "Select next segment element");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/select/next-segment");
+    cprop_decl title = MnemonicString("action", "Next segment element");
+    cprop_decl description = TranslatableString("action", "Select next segment element");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::NextSegment, PlayMode::PlayNote);
 };
 
 struct SelectPrevSegmentCommand {
-    sci_auto id = Command("command://notation/select/prev-segment");
-    sci_auto title = MnemonicString("action", "Previous segment element");
-    sci_auto description = TranslatableString("action", "Select previous segment element");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/select/prev-segment");
+    cprop_decl title = MnemonicString("action", "Previous segment element");
+    cprop_decl description = TranslatableString("action", "Select previous segment element");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::PrevSegment, PlayMode::PlayNote);
 };
 
 struct SelectNextTrackCommand {
-    sci_auto id = Command("command://notation/select/next-track");
-    sci_auto title = MnemonicString("action", "Next staff or voice");
-    sci_auto description = TranslatableString("action", "Go to next staff or voice");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/select/next-track");
+    cprop_decl title = MnemonicString("action", "Next staff or voice");
+    cprop_decl description = TranslatableString("action", "Go to next staff or voice");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::NextTrack, PlayMode::PlayChord);
 };
 
 struct SelectPrevTrackCommand {
-    sci_auto id = Command("command://notation/select/prev-track");
-    sci_auto title = MnemonicString("action", "Previous staff or voice");
-    sci_auto description = TranslatableString("action", "Go to previous staff or voice");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/select/prev-track");
+    cprop_decl title = MnemonicString("action", "Previous staff or voice");
+    cprop_decl description = TranslatableString("action", "Go to previous staff or voice");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::PrevTrack, PlayMode::PlayChord);
 };
 
 struct SelectNextFrameCommand {
-    sci_auto id = Command("command://notation/select/next-frame");
-    sci_auto title = MnemonicString("action", "Next frame");
-    sci_auto description = TranslatableString("action", "Go to next frame");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/select/next-frame");
+    cprop_decl title = MnemonicString("action", "Next frame");
+    cprop_decl description = TranslatableString("action", "Go to next frame");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::NextFrame);
 };
 
 struct SelectPrevFrameCommand {
-    sci_auto id = Command("command://notation/select/prev-frame");
-    sci_auto title = MnemonicString("action", "Previous frame");
-    sci_auto description = TranslatableString("action", "Go to previous frame");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/select/prev-frame");
+    cprop_decl title = MnemonicString("action", "Previous frame");
+    cprop_decl description = TranslatableString("action", "Go to previous frame");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::PrevFrame);
 };
 
 struct SelectNextSystemCommand {
-    sci_auto id = Command("command://notation/select/next-system");
-    sci_auto title = MnemonicString("action", "Next system");
-    sci_auto description = TranslatableString("action", "Go to next system");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/select/next-system");
+    cprop_decl title = MnemonicString("action", "Next system");
+    cprop_decl description = TranslatableString("action", "Go to next system");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::NextSystem);
 };
 
 struct SelectPrevSystemCommand {
-    sci_auto id = Command("command://notation/select/prev-system");
-    sci_auto title = MnemonicString("action", "Previous system");
-    sci_auto description = TranslatableString("action", "Go to previous system");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/select/prev-system");
+    cprop_decl title = MnemonicString("action", "Previous system");
+    cprop_decl description = TranslatableString("action", "Go to previous system");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::PrevSystem);
 };
 
 struct SelectUpNoteInChordCommand {
-    sci_auto id = Command("command://notation/select/up-note-in-chord");
-    sci_auto title = MnemonicString("action", "Up note in chord");
-    sci_auto description = TranslatableString("action", "Select note/rest above");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/select/up-note-in-chord");
+    cprop_decl title = MnemonicString("action", "Up note in chord");
+    cprop_decl description = TranslatableString("action", "Select note/rest above");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::UpNoteInChord);
 };
 
 struct SelectDownNoteInChordCommand {
-    sci_auto id = Command("command://notation/select/down-note-in-chord");
-    sci_auto title = MnemonicString("action", "Down note in chord");
-    sci_auto description = TranslatableString("action", "Select note/rest below");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/select/down-note-in-chord");
+    cprop_decl title = MnemonicString("action", "Down note in chord");
+    cprop_decl description = TranslatableString("action", "Select note/rest below");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::DownNoteInChord);
 };
 
 struct SelectTopNoteInChordCommand {
-    sci_auto id = Command("command://notation/select/top-note-in-chord");
-    sci_auto title = MnemonicString("action", "Top note in chord");
-    sci_auto description = TranslatableString("action", "Select top note in chord");
-    sci_auto availabilities = Availability::UI;
-    sci_auto annotations = Annotation::Idempotent;
+    cprop_decl id = Command("command://notation/select/top-note-in-chord");
+    cprop_decl title = MnemonicString("action", "Top note in chord");
+    cprop_decl description = TranslatableString("action", "Select top note in chord");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::TopNoteInChord);
 };
 
 struct SelectBottomNoteInChordCommand {
-    sci_auto id = Command("command://notation/select/bottom-note-in-chord");
-    sci_auto title = MnemonicString("action", "Bottom note in chord");
-    sci_auto description = TranslatableString("action", "Select bottom note in chord");
-    sci_auto availabilities = Availability::UI;
-    sci_auto annotations = Annotation::Idempotent;
+    cprop_decl id = Command("command://notation/select/bottom-note-in-chord");
+    cprop_decl title = MnemonicString("action", "Bottom note in chord");
+    cprop_decl description = TranslatableString("action", "Select bottom note in chord");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::BottomNoteInChord);
 };
 
 struct SelectTopStaffCommand {
-    sci_auto id = Command("command://notation/select/top-staff");
-    sci_auto title = MnemonicString("action", "Go to top staff");
-    sci_auto description = TranslatableString("action", "Go to top staff");
-    sci_auto availabilities = Availability::UI;
-    sci_auto annotations = Annotation::Idempotent;
+    cprop_decl id = Command("command://notation/select/top-staff");
+    cprop_decl title = MnemonicString("action", "Go to top staff");
+    cprop_decl description = TranslatableString("action", "Go to top staff");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::TopStaff, PlayMode::PlayChord);
 };
 
 struct SelectEmptyTrailingMeasureCommand {
-    sci_auto id = Command("command://notation/select/empty-trailing-measure");
-    sci_auto title = MnemonicString("action", "Go to first empty trailing measure");
-    sci_auto description = TranslatableString("action", "Go to first empty trailing measure");
-    sci_auto availabilities = Availability::UI;
-    sci_auto annotations = Annotation::Idempotent;
+    cprop_decl id = Command("command://notation/select/empty-trailing-measure");
+    cprop_decl title = MnemonicString("action", "Go to first empty trailing measure");
+    cprop_decl description = TranslatableString("action", "Go to first empty trailing measure");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::EmptyTrailingMeasure);
 };
 
 struct SelectSimilarCommand {
-    sci_auto id = Command("command://notation/select/similar");
-    sci_auto title = MnemonicString("action", "Similar");
-    sci_auto description = TranslatableString("action", "Select similar elements");
-    sci_auto availabilities = Availability::UI;
-    sci_auto annotations = Annotation::Idempotent;
+    cprop_decl id = Command("command://notation/select/similar");
+    cprop_decl title = MnemonicString("action", "Similar");
+    cprop_decl description = TranslatableString("action", "Select similar elements");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::Similar);
 };
 
 struct SelectSimilarInStaffCommand {
-    sci_auto id = Command("command://notation/select/similar-in-staff");
-    sci_auto title = MnemonicString("action", "Similar on this staff");
-    sci_auto description = TranslatableString("action", "Select similar elements on the same staff");
-    sci_auto availabilities = Availability::UI;
-    sci_auto annotations = Annotation::Idempotent;
+    cprop_decl id = Command("command://notation/select/similar-in-staff");
+    cprop_decl title = MnemonicString("action", "Similar on this staff");
+    cprop_decl description = TranslatableString("action", "Select similar elements on the same staff");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::SimilarInStaff);
 };
 
 struct SelectSimilarInRangeCommand {
-    sci_auto id = Command("command://notation/select/similar-in-range");
-    sci_auto title = MnemonicString("action", "Similar in this range");
-    sci_auto description = TranslatableString("action", "Select similar elements in the selected range");
-    sci_auto availabilities = Availability::UI;
-    sci_auto annotations = Annotation::Idempotent;
+    cprop_decl id = Command("command://notation/select/similar-in-range");
+    cprop_decl title = MnemonicString("action", "Similar in this range");
+    cprop_decl description = TranslatableString("action", "Select similar elements in the selected range");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::SimilarInRange);
 };
 
 struct SelectNotesInChordCommand {
-    sci_auto id = Command("command://notation/select/notes-in-chord");
-    sci_auto title = MnemonicString("action", "Notes in chord");
-    sci_auto description = TranslatableString("action", "Select notes in chord");
-    sci_auto availabilities = Availability::UI;
-    sci_auto annotations = Annotation::Idempotent;
+    cprop_decl id = Command("command://notation/select/notes-in-chord");
+    cprop_decl title = MnemonicString("action", "Notes in chord");
+    cprop_decl description = TranslatableString("action", "Select notes in chord");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::NotesInChord);
 };
 
 struct SelectAllCommand {
-    sci_auto id = Command("command://notation/select/all");
-    sci_auto title = MnemonicString("action", "Select &all");
-    sci_auto description = TranslatableString("action", "Select all");
-    sci_auto availabilities = Availability::UI;
-    sci_auto annotations = Annotation::Idempotent;
+    cprop_decl id = Command("command://notation/select/all");
+    cprop_decl title = MnemonicString("action", "Select &all");
+    cprop_decl description = TranslatableString("action", "Select all");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::All);
 };
 
 struct SelectSectionCommand {
-    sci_auto id = Command("command://notation/select/section");
-    sci_auto title = MnemonicString("action", "Select sectio&n");
-    sci_auto description = TranslatableString("action", "Select section");
-    sci_auto availabilities = Availability::UI;
-    sci_auto annotations = Annotation::Idempotent;
+    cprop_decl id = Command("command://notation/select/section");
+    cprop_decl title = MnemonicString("action", "Select sectio&n");
+    cprop_decl description = TranslatableString("action", "Select section");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SelectCommand(SelectionTarget::Section);
 };
 
-// aliases for add to selection command
-struct AddToSelectionTargetCommand {
-    sci_auto id = Command("command://notation/add-to-selection/target");
-    sci_auto title = MnemonicString("action", "Add to selection");
-    sci_auto description = TranslatableString("action", "Add items to selection by target");
-    sci_auto availabilities = Availability::API;
+struct AddToSelectionCommand {
+    cprop_decl id = Command("command://notation/add-to-selection");
+    cprop_decl title = MnemonicString("action", "Add to selection");
+    cprop_decl description = TranslatableString("action", "Add items to selection by target");
+    cprop_decl availabilities = Availability::API;
+    cprop_decl annotations = Annotation::None;
 
     SelectionTarget target = SelectionTarget::BeginSystem;
 
-    sce_auto input = FieldsScheme {
-        Field{ "target", &AddToSelectionTargetCommand::target, "Selection target" },
+    cprop_decl input = FieldsScheme {
+        Field{ "target", &AddToSelectionCommand::target, "Selection target" },
     };
 };
 
+// aliases for add to selection command
 struct AddToSelectionNextChordCommand {
-    sci_auto id = Command("command://notation/add-to-selection/next-chord");
-    sci_auto title = MnemonicString("action", "Add next chord to selection");
-    sci_auto description = TranslatableString("action", "Add to selection: next note/rest");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/add-to-selection/next-chord");
+    cprop_decl title = MnemonicString("action", "Add next chord to selection");
+    cprop_decl description = TranslatableString("action", "Add to selection: next note/rest");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddToSelectionCommand(SelectionTarget::NextChord);
 };
 
 struct AddToSelectionPrevChordCommand {
-    sci_auto id = Command("command://notation/add-to-selection/prev-chord");
-    sci_auto title = MnemonicString("action", "Add previous chord to selection");
-    sci_auto description = TranslatableString("action", "Add to selection: previous note/rest");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/add-to-selection/prev-chord");
+    cprop_decl title = MnemonicString("action", "Add previous chord to selection");
+    cprop_decl description = TranslatableString("action", "Add to selection: previous note/rest");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddToSelectionCommand(SelectionTarget::PrevChord);
 };
 
 struct AddToSelectionNextMeasureCommand {
-    sci_auto id = Command("command://notation/add-to-selection/next-measure");
-    sci_auto title = MnemonicString("action", "Add next measure to selection");
-    sci_auto description = TranslatableString("action", "Add to selection: next measure");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/add-to-selection/next-measure");
+    cprop_decl title = MnemonicString("action", "Add next measure to selection");
+    cprop_decl description = TranslatableString("action", "Add to selection: next measure");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddToSelectionCommand(SelectionTarget::NextMeasure);
 };
 
 struct AddToSelectionPrevMeasureCommand {
-    sci_auto id = Command("command://notation/add-to-selection/prev-measure");
-    sci_auto title = MnemonicString("action", "Add previous measure to selection");
-    sci_auto description = TranslatableString("action", "Add to selection: previous measure");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/add-to-selection/prev-measure");
+    cprop_decl title = MnemonicString("action", "Add previous measure to selection");
+    cprop_decl description = TranslatableString("action", "Add to selection: previous measure");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddToSelectionCommand(SelectionTarget::PrevMeasure);
 };
 
 struct AddToSelectionAboveStaffCommand {
-    sci_auto id = Command("command://notation/add-to-selection/above-staff");
-    sci_auto title = MnemonicString("action", "Add staff above to selection");
-    sci_auto description = TranslatableString("action", "Add to selection: staff above");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/add-to-selection/above-staff");
+    cprop_decl title = MnemonicString("action", "Add staff above to selection");
+    cprop_decl description = TranslatableString("action", "Add to selection: staff above");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddToSelectionCommand(SelectionTarget::AboveStaff);
 };
 
 struct AddToSelectionBelowStaffCommand {
-    sci_auto id = Command("command://notation/add-to-selection/below-staff");
-    sci_auto title = MnemonicString("action", "Add staff below to selection");
-    sci_auto description = TranslatableString("action", "Add to selection: staff below");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/add-to-selection/below-staff");
+    cprop_decl title = MnemonicString("action", "Add staff below to selection");
+    cprop_decl description = TranslatableString("action", "Add to selection: staff below");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddToSelectionCommand(SelectionTarget::BelowStaff);
 };
 
 struct AddToSelectionBeginSystemCommand {
-    sci_auto id = Command("command://notation/add-to-selection/begin-system");
-    sci_auto title = MnemonicString("action", "Select to beginning of system");
-    sci_auto description = TranslatableString("action", "Add to selection: beginning of system");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/add-to-selection/begin-system");
+    cprop_decl title = MnemonicString("action", "Select to beginning of system");
+    cprop_decl description = TranslatableString("action", "Add to selection: beginning of system");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddToSelectionCommand(SelectionTarget::BeginSystem);
 };
 
 struct AddToSelectionEndSystemCommand {
-    sci_auto id = Command("command://notation/add-to-selection/end-system");
-    sci_auto title = MnemonicString("action", "Select to end of system");
-    sci_auto description = TranslatableString("action", "Add to selection: end of system");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/add-to-selection/end-system");
+    cprop_decl title = MnemonicString("action", "Select to end of system");
+    cprop_decl description = TranslatableString("action", "Add to selection: end of system");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddToSelectionCommand(SelectionTarget::EndSystem);
 };
 
 struct AddToSelectionBeginScoreCommand {
-    sci_auto id = Command("command://notation/add-to-selection/begin-score");
-    sci_auto title = MnemonicString("action", "Select to beginning of score");
-    sci_auto description = TranslatableString("action", "Add to selection: beginning of score");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/add-to-selection/begin-score");
+    cprop_decl title = MnemonicString("action", "Select to beginning of score");
+    cprop_decl description = TranslatableString("action", "Add to selection: beginning of score");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddToSelectionCommand(SelectionTarget::BeginScore);
 };
 
 struct AddToSelectionEndScoreCommand {
-    sci_auto id = Command("command://notation/add-to-selection/end-score");
-    sci_auto title = MnemonicString("action", "Select to end of score");
-    sci_auto description = TranslatableString("action", "Add to selection: end of score");
-    sci_auto availabilities = Availability::UI;
+    cprop_decl id = Command("command://notation/add-to-selection/end-score");
+    cprop_decl title = MnemonicString("action", "Select to end of score");
+    cprop_decl description = TranslatableString("action", "Add to selection: end of score");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddToSelectionCommand(SelectionTarget::EndScore);
 };
 
-//inline static const muse::rcommand::Command ADD_TO_SELECTION_NEXT_CHORD_COMMAND("command://notation/add-to-selection-next-chord");
-//inline static const muse::rcommand::Command ADD_TO_SELECTION_PREV_CHORD_COMMAND("command://notation/add-to-selection-prev-chord");
-//inline static const muse::rcommand::Command ADD_TO_SELECTION_NEXT_MEASURE_COMMAND("command://notation/add-to-selection-next-measure");
-//inline static const muse::rcommand::Command ADD_TO_SELECTION_PREV_MEASURE_COMMAND("command://notation/add-to-selection-prev-measure");
-//inline static const muse::rcommand::Command ADD_TO_SELECTION_ABOVE_STAFF_COMMAND("command://notation/add-to-selection-above-staff");
-//inline static const muse::rcommand::Command ADD_TO_SELECTION_BELOW_STAFF_COMMAND("command://notation/add-to-selection-below-staff");
-//inline static const muse::rcommand::Command ADD_TO_SELECTION_BEGIN_SYSTEM_COMMAND("command://notation/add-to-selection-begin-system");
-//inline static const muse::rcommand::Command ADD_TO_SELECTION_END_SYSTEM_COMMAND("command://notation/add-to-selection-end-system");
-//inline static const muse::rcommand::Command ADD_TO_SELECTION_BEGIN_SCORE_COMMAND("command://notation/add-to-selection-begin-score");
-//inline static const muse::rcommand::Command ADD_TO_SELECTION_END_SCORE_COMMAND("command://notation/add-to-selection-end-score");
-
-struct FlipCommand {
-    sci_auto id = Command("command://notation/flip");
-    sci_auto title = MnemonicString("action", "Flip direction");
-    sci_auto description = TranslatableString("action", "Flip direction");
-    sci_auto decoration = muse::rcommand::Decoration(muse::ui::IconCode::Code::NOTE_FLIP);
+struct OpenSelectionOptionsCommand {
+    cprop_decl id = Command("command://notation/open-selection-options");
+    cprop_decl title = MnemonicString("action", "Selection options");
+    cprop_decl description = TranslatableString("action", "Open selection options");
+    cprop_decl availabilities = Availability::UI;
 };
 
-struct AddNoteCommand {
-    sci_auto id = muse::rcommand::Command("command://notation/add-note");
-    sci_auto title = MnemonicString("action", "Add note");
-    sci_auto description = TranslatableString("action", "Add note");
+struct ShowLocationCommand {
+    cprop_decl id = Command("command://notation/show-location");
+    cprop_decl title = MnemonicString("action", "Show location");
+    cprop_decl description = TranslatableString("action", "Show current location in score");
+    cprop_decl availabilities = Availability::UI;
+};
 
-    NoteName note = NoteName::C;
-    NoteAddingMode mode = NoteAddingMode::CurrentChord;
+// note input commands
+struct ToggleNoteInputCommand {
+    cprop_decl id = Command("command://notation/toggle-note-input");
+    cprop_decl title = MnemonicString("action", "Toggle note input");
+    cprop_decl description = TranslatableString("action", "Toggle note input");
+    cprop_decl availabilities = Availability::API;
 
-    sce_auto input = std::tuple {
-        Field{ "note", &AddNoteCommand::note, "Note name" },
-        Field{ "mode", &AddNoteCommand::mode, "Adding mode", Presence::Optional },
+    NoteInputMethod method = NoteInputMethod::DEFAULT;
+
+    cprop_decl input = FieldsScheme {
+        Field{ "method", &ToggleNoteInputCommand::method, "Note input method" },
     };
 };
 
-//! NOTE "Read" commands for MCP and maybe API
-struct GetNoteInputStateCommand {
-    sci_auto id = muse::rcommand::Command("command://notation/get-noteinput-state");
-    sci_auto title = MnemonicString("action", "Get note input state");
-    sci_auto description = TranslatableString("action", "Get note input state");
-    sci_auto availabilities = muse::rcommand::Availability::MCP;
-    sci_auto annotations = muse::rcommand::Annotation::ReadOnly;
+// aliases for toggle note input command
+struct ToggleNoteInputDefaultCommand {
+    cprop_decl id = Command("command://notation/toggle-note-input/default");
+    cprop_decl title = MnemonicString("action", "Note input");
+    cprop_decl description = TranslatableString("action", "Toggle note input mode");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::EDIT, Checkable::Yes);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleNoteInputCommand(NoteInputMethod::DEFAULT);
+};
+
+struct ToggleNoteInputByNameCommand {
+    cprop_decl id = Command("command://notation/toggle-note-input/by-note-name");
+    cprop_decl title = MnemonicString("action", "Note input by note name");
+    cprop_decl description = TranslatableString("action", "Toggle note input mode by note name");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::EDIT, Checkable::Yes);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleNoteInputCommand(NoteInputMethod::BY_NOTE_NAME);
+};
+
+struct ToggleNoteInputByDurationCommand {
+    cprop_decl id = Command("command://notation/toggle-note-input/by-duration");
+    cprop_decl title = MnemonicString("action", "Note input by duration");
+    cprop_decl description = TranslatableString("action", "Toggle note input mode by duration");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::DURATION_CURSOR, Checkable::Yes);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleNoteInputCommand(NoteInputMethod::BY_DURATION);
+};
+
+struct ToggleNoteInputRhythmCommand {
+    cprop_decl id = Command("command://notation/toggle-note-input/rhythm");
+    cprop_decl title = MnemonicString("action", "Rhythm only (not pitch)");
+    cprop_decl description = TranslatableString("action", "Toggle note input mode: rhythm only (not pitch)");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::RHYTHM_ONLY, Checkable::Yes);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleNoteInputCommand(NoteInputMethod::RHYTHM);
+};
+
+struct ToggleNoteInputRepitchCommand {
+    cprop_decl id = Command("command://notation/toggle-note-input/repitch");
+    cprop_decl title = MnemonicString("action", "Re-pitch existing notes");
+    cprop_decl description = TranslatableString("action", "Toggle note input mode: re-pitch existing notes");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::RE_PITCH, Checkable::Yes);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleNoteInputCommand(NoteInputMethod::REPITCH);
+};
+
+struct ToggleNoteInputRealtimeAutoCommand {
+    cprop_decl id = Command("command://notation/toggle-note-input/realtime-auto");
+    cprop_decl title = MnemonicString("action", "Real-time (metronome)");
+    cprop_decl description = TranslatableString("action", "Toggle note input mode: real-time (metronome)");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::METRONOME, Checkable::Yes);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleNoteInputCommand(NoteInputMethod::REALTIME_AUTO);
+};
+
+struct ToggleNoteInputRealtimeManualCommand {
+    cprop_decl id = Command("command://notation/toggle-note-input/realtime-manual");
+    cprop_decl title = MnemonicString("action", "Real-time (foot pedal)");
+    cprop_decl description = TranslatableString("action", "Toggle note input mode: real-time (foot pedal)");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::FOOT_PEDAL, Checkable::Yes);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleNoteInputCommand(NoteInputMethod::REALTIME_MANUAL);
+};
+
+struct ToggleNoteInputTimewiseCommand {
+    cprop_decl id = Command("command://notation/toggle-note-input/timewise");
+    cprop_decl title = MnemonicString("action", "Insert");
+    cprop_decl description = TranslatableString("action", "Toggle note input mode: insert (increases measure duration)");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_PLUS, Checkable::Yes);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleNoteInputCommand(NoteInputMethod::TIMEWISE);
+};
+
+struct ToggleInsertModeCommand {
+    cprop_decl id = Command("command://notation/toggle-note-input/toggle-insert-mode");
+    cprop_decl title = MnemonicString("action", "Insert/overwrite");
+    cprop_decl description = TranslatableString("action", "Toggle note input mode: insert/overwrite");
+    cprop_decl availabilities = Availability::UI;
+};
+
+// note input set duration commands
+struct SetDurationCommand {
+    cprop_decl id = Command("command://notation/set-duration");
+    cprop_decl title = MnemonicString("action", "Set duration");
+    cprop_decl description = TranslatableString("action", "Set duration");
+    cprop_decl availabilities = Availability::API;
+
+    DurationType duration = DurationType::V_QUARTER;
+
+    cprop_decl input = FieldsScheme {
+        Field{ "duration", &SetDurationCommand::duration, "Duration" },
+    };
+};
+
+// aliases for set duration commands
+struct SetDurationLongaCommand {
+    cprop_decl id = Command("command://notation/set-duration/longa");
+    cprop_decl title = MnemonicString("action", "Longa");
+    cprop_decl description = TranslatableString("action", "Set duration: longa");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::LONGO);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_LONG);
+};
+
+struct SetDurationBreveCommand {
+    cprop_decl id = Command("command://notation/set-duration/breve");
+    cprop_decl title = MnemonicString("action", "Breve");
+    cprop_decl description = TranslatableString("action", "Set duration: breve");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_WHOLE_DOUBLE);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_BREVE);
+};
+
+struct SetDurationWholeCommand {
+    cprop_decl id = Command("command://notation/set-duration/whole");
+    cprop_decl title = MnemonicString("action", "Whole note");
+    cprop_decl description = TranslatableString("action", "Set duration: whole note");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_WHOLE);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_WHOLE);
+};
+
+struct SetDurationHalfCommand {
+    cprop_decl id = Command("command://notation/set-duration/half");
+    cprop_decl title = MnemonicString("action", "Half note");
+    cprop_decl description = TranslatableString("action", "Set duration: half note");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_HALF);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_HALF);
+};
+
+struct SetDurationQuarterCommand {
+    cprop_decl id = Command("command://notation/set-duration/quarter");
+    cprop_decl title = MnemonicString("action", "Quarter note");
+    cprop_decl description = TranslatableString("action", "Set duration: quarter note");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_QUARTER);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_QUARTER);
+};
+
+struct SetDurationEighthCommand {
+    cprop_decl id = Command("command://notation/set-duration/eighth");
+    cprop_decl title = MnemonicString("action", "Eighth note");
+    cprop_decl description = TranslatableString("action", "Set duration: eighth note");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_8TH);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_EIGHTH);
+};
+
+struct SetDuration16thCommand {
+    cprop_decl id = Command("command://notation/set-duration/16th");
+    cprop_decl title = MnemonicString("action", "16th note");
+    cprop_decl description = TranslatableString("action", "Set duration: 16th note");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_16TH);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_16TH);
+};
+
+struct SetDuration32ndCommand {
+    cprop_decl id = Command("command://notation/set-duration/32nd");
+    cprop_decl title = MnemonicString("action", "32nd note");
+    cprop_decl description = TranslatableString("action", "Set duration: 32nd note");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_32ND);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_32ND);
+};
+
+struct SetDuration64thCommand {
+    cprop_decl id = Command("command://notation/set-duration/64th");
+    cprop_decl title = MnemonicString("action", "64th note");
+    cprop_decl description = TranslatableString("action", "Set duration: 64th note");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_64TH);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_64TH);
+};
+
+struct SetDuration128thCommand {
+    cprop_decl id = Command("command://notation/set-duration/128th");
+    cprop_decl title = MnemonicString("action", "128th note");
+    cprop_decl description = TranslatableString("action", "Set duration: 128th note");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_128TH);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_128TH);
+};
+
+struct SetDuration256thCommand {
+    cprop_decl id = Command("command://notation/set-duration/256th");
+    cprop_decl title = MnemonicString("action", "256th note");
+    cprop_decl description = TranslatableString("action", "Set duration: 256th note");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_256TH);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_256TH);
+};
+
+struct SetDuration512thCommand {
+    cprop_decl id = Command("command://notation/set-duration/512th");
+    cprop_decl title = MnemonicString("action", "512th note");
+    cprop_decl description = TranslatableString("action", "Set duration: 512th note");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_512TH);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_512TH);
+};
+
+struct SetDuration1024thCommand {
+    cprop_decl id = Command("command://notation/set-duration/1024th");
+    cprop_decl title = MnemonicString("action", "1024th note");
+    cprop_decl description = TranslatableString("action", "Set duration: 1024th note");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_1024TH);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = SetDurationCommand(DurationType::V_1024TH);
+};
+
+// increase/decrease duration commands
+struct ChangeDurationCommand {
+    cprop_decl id = Command("command://notation/change-duration");
+    cprop_decl title = MnemonicString("action", "Change duration");
+    cprop_decl description = TranslatableString("action", "Change duration");
+    cprop_decl availabilities = Availability::API;
+
+    ChangeDurationMode mode = ChangeDurationMode::Double;
+
+    cprop_decl input = FieldsScheme {
+        Field{ "mode", &ChangeDurationCommand::mode, "Change duration mode" },
+    };
+};
+
+// aliases for change duration command
+struct ChangeDurationDoubleCommand {
+    cprop_decl id = Command("command://notation/change-duration/double");
+    cprop_decl title = MnemonicString("action", "Double duration");
+    cprop_decl description = TranslatableString("action", "Double selected duration");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ChangeDurationCommand(ChangeDurationMode::Double);
+};
+
+struct ChangeDurationHalveCommand {
+    cprop_decl id = Command("command://notation/change-duration/halve");
+    cprop_decl title = MnemonicString("action", "Halve duration");
+    cprop_decl description = TranslatableString("action", "Halve selected duration");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ChangeDurationCommand(ChangeDurationMode::Halve);
+};
+
+struct ChangeDurationDoubleDottedCommand {
+    cprop_decl id = Command("command://notation/change-duration/double-dotted");
+    cprop_decl title = MnemonicString("action", "Double selected duration (dotted)");
+    cprop_decl description = TranslatableString("action", "Double selected duration (includes dotted values)");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ChangeDurationCommand(ChangeDurationMode::DoubleDotted);
+};
+
+struct ChangeDurationHalveDottedCommand {
+    cprop_decl id = Command("command://notation/change-duration/halve-dotted");
+    cprop_decl title = MnemonicString("action", "Halve selected duration (dotted)");
+    cprop_decl description = TranslatableString("action", "Halve selected duration (includes dotted values)");
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ChangeDurationCommand(ChangeDurationMode::HalveDotted);
+};
+
+struct ToggleDotsCommand {
+    cprop_decl id = Command("command://notation/toggle-dots");
+    cprop_decl title = MnemonicString("action", "Toggle dots");
+    cprop_decl description = TranslatableString("action", "Toggle dots");
+    cprop_decl availabilities = Availability::API;
+
+    int dots = 1;
+
+    cprop_decl input = FieldsScheme {
+        Field{ "dots", &ToggleDotsCommand::dots, "Number of dots", 1, engraving::MAX_DOTS },
+    };
+};
+
+// aliases for toggle dots command
+struct ToggleDotCommand {
+    cprop_decl id = Command("command://notation/toggle-dots/1");
+    cprop_decl title = MnemonicString("action", "Augmentation dot");
+    cprop_decl description = TranslatableString("action", "Toggle duration dot");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_DOTTED);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleDotsCommand(1);
+};
+
+struct ToggleDot2Command {
+    cprop_decl id = Command("command://notation/toggle-dots/2");
+    cprop_decl title = MnemonicString("action", "Double augmentation dot");
+    cprop_decl description = TranslatableString("action", "Toggle duration dot: double");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_DOTTED_2);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleDotsCommand(2);
+};
+
+struct ToggleDot3Command {
+    cprop_decl id = Command("command://notation/toggle-dots/3");
+    cprop_decl title = MnemonicString("action", "Triple augmentation dot");
+    cprop_decl description = TranslatableString("action", "Toggle duration dot: triple");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_DOTTED_3);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleDotsCommand(3);
+};
+
+struct ToggleDot4Command {
+    cprop_decl id = Command("command://notation/toggle-dots/4");
+    cprop_decl title = MnemonicString("action", "Quadruple augmentation dot");
+    cprop_decl description = TranslatableString("action", "Toggle duration dot: quadruple");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NOTE_DOTTED_4);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleDotsCommand(4);
+};
+
+struct ToggleRestCommand {
+    cprop_decl id = Command("command://notation/toggle-rest");
+    cprop_decl title = MnemonicString("action", "Rest");
+    cprop_decl description = TranslatableString("action", "Toggle rest");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::REST);
+    cprop_decl availabilities = Availability::All;
+};
+
+struct RequestNoteInputStateCommand {
+    cprop_decl id = Command("command://notation/request-noteinput-state");
+    cprop_decl title = MnemonicString("action", "Get note input state");
+    cprop_decl description = TranslatableString("action", "Get note input state");
+    cprop_decl availabilities = muse::rcommand::Availability::API;
+    cprop_decl annotations = muse::rcommand::Annotation::ReadOnly;
 
     struct Output {
         bool enabled = false;
         NoteInputMethod method = NoteInputMethod::BY_NOTE_NAME;
     };
 
-    using O = GetNoteInputStateCommand::Output;
-    sce_auto output = std::tuple {
+    using O = RequestNoteInputStateCommand::Output;
+    cprop_decl output = std::tuple {
         Field{ "enabled", &O::enabled, "Flag indicating whether the note input mode is enabled" },
         Field{ "method", &O::method, "The method used to input the note" },
     };
 };
 
-#undef sci_auto
-#undef sce_auto
+// add note command
+struct AddNoteCommand {
+    cprop_decl id = muse::rcommand::Command("command://notation/add-note");
+    cprop_decl title = MnemonicString("action", "Add note");
+    cprop_decl description = TranslatableString("action", "Add note");
+    cprop_decl availabilities = Availability::API;
+
+    NoteName note = NoteName::C;
+    NoteAddingMode mode = NoteAddingMode::NextChord;
+
+    cprop_decl input = std::tuple {
+        Field{ "note", &AddNoteCommand::note, "Note name" },
+        Field{ "mode", &AddNoteCommand::mode, "Adding mode", Presence::Optional },
+    };
+};
+
+//! NOTE Shared templates for note commands, declared once to avoid translation duplication.
+//! They are created on first use, so they cannot be used before initialization
+//! (the static initialization order across translation units is undefined).
+namespace prv {
+using TS = TranslatableString;
+//: Note
+inline const TS& noteC() { static const TS s = TranslatableString("action", "C"); return s; }
+//: Note
+inline const TS& noteD() { static const TS s = TranslatableString("action", "D"); return s; }
+//: Note
+inline const TS& noteE() { static const TS s = TranslatableString("action", "E"); return s; }
+//: Note
+inline const TS& noteF() { static const TS s = TranslatableString("action", "F"); return s; }
+//: Note
+inline const TS& noteG() { static const TS s = TranslatableString("action", "G"); return s; }
+//: Note
+inline const TS& noteA() { static const TS s = TranslatableString("action", "A"); return s; }
+//: Note
+inline const TS& noteB() { static const TS s = TranslatableString("action", "B"); return s; }
+//: Enter note %1
+inline const TS& Enter_note_X() { static const TS s = TranslatableString("action", "Enter note %1"); return s; }
+//: Add %1 to chord
+inline const TS& Add_X_to_chord() { static const TS s = TranslatableString("action", "Add %1 to chord"); return s; }
+//: Add note %1 to chord
+inline const TS& Add_note_X_to_chord() { static const TS s = TranslatableString("action", "Add note %1 to chord"); return s; }
+//: Insert %1
+inline const TS& Insert_X() { static const TS s = TranslatableString("action", "Insert %1"); return s; }
+} // namespace prv
+
+// aliases for add note command
+struct AddNoteC_ToNextChordCommand {
+    cprop_decl id = Command("command://notation/add-note/next-chord/c");
+    cprop_decl title = MnemonicString(prv::noteC());
+    cprop_decl description = prv::Enter_note_X().arg(prv::noteC());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::C, NoteAddingMode::NextChord);
+};
+
+struct AddNoteD_ToNextChordCommand {
+    cprop_decl id = Command("command://notation/add-note/next-chord/d");
+    cprop_decl title = MnemonicString(prv::noteD());
+    cprop_decl description = prv::Enter_note_X().arg(prv::noteD());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::D, NoteAddingMode::NextChord);
+};
+
+struct AddNoteE_ToNextChordCommand {
+    cprop_decl id = Command("command://notation/add-note/next-chord/e");
+    cprop_decl title = MnemonicString(prv::noteE());
+    cprop_decl description = prv::Enter_note_X().arg(prv::noteE());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::E, NoteAddingMode::NextChord);
+};
+
+struct AddNoteF_ToNextChordCommand {
+    cprop_decl id = Command("command://notation/add-note/next-chord/f");
+    cprop_decl title = MnemonicString(prv::noteF());
+    cprop_decl description = prv::Enter_note_X().arg(prv::noteF());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::F, NoteAddingMode::NextChord);
+};
+
+struct AddNoteG_ToNextChordCommand {
+    cprop_decl id = Command("command://notation/add-note/next-chord/g");
+    cprop_decl title = MnemonicString(prv::noteG());
+    cprop_decl description = prv::Enter_note_X().arg(prv::noteG());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::G, NoteAddingMode::NextChord);
+};
+
+struct AddNoteA_ToNextChordCommand {
+    cprop_decl id = Command("command://notation/add-note/next-chord/a");
+    cprop_decl title = MnemonicString(prv::noteA());
+    cprop_decl description = prv::Enter_note_X().arg(prv::noteA());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::A, NoteAddingMode::NextChord);
+};
+
+struct AddNoteB_ToNextChordCommand {
+    cprop_decl id = Command("command://notation/add-note/next-chord/b");
+    cprop_decl title = MnemonicString(prv::noteB());
+    cprop_decl description = prv::Enter_note_X().arg(prv::noteB());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::B, NoteAddingMode::NextChord);
+};
+
+struct AddNoteC_ToCurrentChordCommand {
+    cprop_decl id = Command("command://notation/add-note/current-chord/c");
+    cprop_decl title = MnemonicString(prv::Add_X_to_chord().arg(prv::noteC()));
+    cprop_decl description = prv::Add_note_X_to_chord().arg(prv::noteC());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::C, NoteAddingMode::CurrentChord);
+};
+
+struct AddNoteD_ToCurrentChordCommand {
+    cprop_decl id = Command("command://notation/add-note/current-chord/d");
+    cprop_decl title = MnemonicString(prv::Add_X_to_chord().arg(prv::noteD()));
+    cprop_decl description = prv::Add_note_X_to_chord().arg(prv::noteD());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::D, NoteAddingMode::CurrentChord);
+};
+
+struct AddNoteE_ToCurrentChordCommand {
+    cprop_decl id = Command("command://notation/add-note/current-chord/e");
+    cprop_decl title = MnemonicString(prv::Add_X_to_chord().arg(prv::noteE()));
+    cprop_decl description = prv::Add_note_X_to_chord().arg(prv::noteE());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::E, NoteAddingMode::CurrentChord);
+};
+
+struct AddNoteF_ToCurrentChordCommand {
+    cprop_decl id = Command("command://notation/add-note/current-chord/f");
+    cprop_decl title = MnemonicString(prv::Add_X_to_chord().arg(prv::noteF()));
+    cprop_decl description = prv::Add_note_X_to_chord().arg(prv::noteF());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::F, NoteAddingMode::CurrentChord);
+};
+
+struct AddNoteG_ToCurrentChordCommand {
+    cprop_decl id = Command("command://notation/add-note/current-chord/g");
+    cprop_decl title = MnemonicString(prv::Add_X_to_chord().arg(prv::noteG()));
+    cprop_decl description = prv::Add_note_X_to_chord().arg(prv::noteG());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::G, NoteAddingMode::CurrentChord);
+};
+
+struct AddNoteA_ToCurrentChordCommand {
+    cprop_decl id = Command("command://notation/add-note/current-chord/a");
+    cprop_decl title = MnemonicString(prv::Add_X_to_chord().arg(prv::noteA()));
+    cprop_decl description = prv::Add_note_X_to_chord().arg(prv::noteA());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::A, NoteAddingMode::CurrentChord);
+};
+
+struct AddNoteB_ToCurrentChordCommand {
+    cprop_decl id = Command("command://notation/add-note/current-chord/b");
+    cprop_decl title = MnemonicString(prv::Add_X_to_chord().arg(prv::noteB()));
+    cprop_decl description = prv::Add_note_X_to_chord().arg(prv::noteB());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::B, NoteAddingMode::CurrentChord);
+};
+
+struct AddNoteC_ToInsertChordCommand {
+    cprop_decl id = Command("command://notation/add-note/insert-chord/c");
+    cprop_decl title = MnemonicString(prv::Insert_X().arg(prv::noteC()));
+    cprop_decl description = prv::Insert_X().arg(prv::noteC());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::C, NoteAddingMode::InsertChord);
+};
+
+struct AddNoteD_ToInsertChordCommand {
+    cprop_decl id = Command("command://notation/add-note/insert-chord/d");
+    cprop_decl title = MnemonicString(prv::Insert_X().arg(prv::noteD()));
+    cprop_decl description = prv::Insert_X().arg(prv::noteD());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::D, NoteAddingMode::InsertChord);
+};
+
+struct AddNoteE_ToInsertChordCommand {
+    cprop_decl id = Command("command://notation/add-note/insert-chord/e");
+    cprop_decl title = MnemonicString(prv::Insert_X().arg(prv::noteE()));
+    cprop_decl description = prv::Insert_X().arg(prv::noteE());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::E, NoteAddingMode::InsertChord);
+};
+
+struct AddNoteF_ToInsertChordCommand {
+    cprop_decl id = Command("command://notation/add-note/insert-chord/f");
+    cprop_decl title = MnemonicString(prv::Insert_X().arg(prv::noteF()));
+    cprop_decl description = prv::Insert_X().arg(prv::noteF());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::F, NoteAddingMode::InsertChord);
+};
+
+struct AddNoteG_ToInsertChordCommand {
+    cprop_decl id = Command("command://notation/add-note/insert-chord/g");
+    cprop_decl title = MnemonicString(prv::Insert_X().arg(prv::noteG()));
+    cprop_decl description = prv::Insert_X().arg(prv::noteG());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::G, NoteAddingMode::InsertChord);
+};
+
+struct AddNoteA_ToInsertChordCommand {
+    cprop_decl id = Command("command://notation/add-note/insert-chord/a");
+    cprop_decl title = MnemonicString(prv::Insert_X().arg(prv::noteA()));
+    cprop_decl description = prv::Insert_X().arg(prv::noteA());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::A, NoteAddingMode::InsertChord);
+};
+
+struct AddNoteB_ToInsertChordCommand {
+    cprop_decl id = Command("command://notation/add-note/insert-chord/b");
+    cprop_decl title = MnemonicString(prv::Insert_X().arg(prv::noteB()));
+    cprop_decl description = prv::Insert_X().arg(prv::noteB());
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = AddNoteCommand(NoteName::B, NoteAddingMode::InsertChord);
+};
+
+// accidental commands
+struct ToggleAccidentalCommand {
+    cprop_decl id = Command("command://notation/toggle-accidental");
+    cprop_decl title = MnemonicString("action", "Toggle accidental");
+    cprop_decl description = TranslatableString("action", "Toggle accidental");
+    cprop_decl availabilities = Availability::API;
+
+    AccidentalType type = AccidentalType::NATURAL;
+    PlayMode playMode = PlayMode::PlayNote;
+    bool affectNoteInput = false;
+
+    cprop_decl input = FieldsScheme {
+        Field{ "type", &ToggleAccidentalCommand::type, "Accidental type" },
+        Field{ "play-mode", &ToggleAccidentalCommand::playMode, "Play mode", Presence::Optional },
+        Field{ "affect-note-input", &ToggleAccidentalCommand::affectNoteInput, "Affect note input", Presence::Optional },
+    };
+};
+
+// aliases for toggle accidental command
+struct ToggleFlat2Command {
+    cprop_decl id = Command("command://notation/toggle-flat2");
+    cprop_decl title = MnemonicString("action", "Toggle double-flat");
+    cprop_decl description = TranslatableString("action", "Toggle accidental: double-flat");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::FLAT_DOUBLE);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleAccidentalCommand(AccidentalType::FLAT2, PlayMode::NoPlay, true);
+};
+
+struct ToggleFlatCommand {
+    cprop_decl id = Command("command://notation/toggle-flat");
+    cprop_decl title = MnemonicString("action", "Toggle flat");
+    cprop_decl description = TranslatableString("action", "Toggle accidental: flat");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::FLAT);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleAccidentalCommand(AccidentalType::FLAT, PlayMode::NoPlay, true);
+};
+
+struct ToggleNaturalCommand {
+    cprop_decl id = Command("command://notation/toggle-natural");
+    cprop_decl title = MnemonicString("action", "Toggle natural");
+    cprop_decl description = TranslatableString("action", "Toggle accidental: natural");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::NATURAL);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleAccidentalCommand(AccidentalType::NATURAL, PlayMode::NoPlay, true);
+};
+
+struct ToggleSharpCommand {
+    cprop_decl id = Command("command://notation/toggle-sharp");
+    cprop_decl title = MnemonicString("action", "Toggle sharp");
+    cprop_decl description = TranslatableString("action", "Toggle accidental: sharp");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::SHARP);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleAccidentalCommand(AccidentalType::SHARP, PlayMode::NoPlay, true);
+};
+
+struct ToggleSharp2Command {
+    cprop_decl id = Command("command://notation/toggle-sharp2");
+    cprop_decl title = MnemonicString("action", "Toggle double-sharp");
+    cprop_decl description = TranslatableString("action", "Toggle accidental: double-sharp");
+    cprop_decl decoration = Decoration(muse::ui::IconCode::Code::SHARP_DOUBLE);
+    cprop_decl availabilities = Availability::UI;
+    cprop_decl redirect = ToggleAccidentalCommand(AccidentalType::SHARP2, PlayMode::NoPlay, true);
+};
+
+struct FlipCommand {
+    cprop_decl id = Command("command://notation/flip");
+    cprop_decl title = MnemonicString("action", "Flip direction");
+    cprop_decl description = TranslatableString("action", "Flip direction");
+    cprop_decl decoration = muse::rcommand::Decoration(muse::ui::IconCode::Code::NOTE_FLIP);
+};
 }
 
 namespace mu::notation {
@@ -386,12 +999,7 @@ inline static const muse::rcommand::Command CANCEL_COMMAND("command://notation/c
 inline static const muse::rcommand::Command UNDO_COMMAND("command://notation/undo");
 inline static const muse::rcommand::Command REDO_COMMAND("command://notation/redo");
 
-// navigation and selection commands
-
-inline static const muse::rcommand::Command OPEN_SELECTION_OPTIONS_COMMAND("command://notation/open-selection-options");
-
 // ------------------------------------------------------------
-inline static const muse::rcommand::Command GET_LOCATION_COMMAND("command://notation/get-location");
 
 // text navigation commands
 inline static const muse::rcommand::Command EDITTEXT_NEXT_WORD_COMMAND("command://notation/edittext-next-word");
@@ -426,57 +1034,10 @@ inline static const muse::rcommand::Command EDITTEXT_TOGGLE_SUBSCRIPT_COMMAND("c
 inline static const muse::rcommand::Command EDITTEXT_TOGGLE_SUPERSCRIPT_COMMAND("command://notation/edittext-toggle-superscript");
 
 // note input commands
-inline static const muse::rcommand::Command TOGGLE_NOTE_INPUT_COMMAND("command://notation/toggle-note-input");
-inline static const muse::rcommand::Command TOGGLE_NOTE_INPUT_BY_NOTE_NAME_COMMAND("command://notation/toggle-note-input-by-note-name");
-inline static const muse::rcommand::Command TOGGLE_NOTE_INPUT_BY_DURATION_COMMAND("command://notation/toggle-note-input-by-duration");
-inline static const muse::rcommand::Command TOGGLE_NOTE_INPUT_RHYTHM_COMMAND("command://notation/toggle-note-input-rhythm");
-inline static const muse::rcommand::Command TOGGLE_NOTE_INPUT_REPITCH_COMMAND("command://notation/toggle-note-input-repitch");
-inline static const muse::rcommand::Command TOGGLE_NOTE_INPUT_REALTIME_AUTO_COMMAND("command://notation/toggle-note-input-realtime-auto");
-inline static const muse::rcommand::Command TOGGLE_NOTE_INPUT_REALTIME_MANUAL_COMMAND(
-    "command://notation/toggle-note-input-realtime-manual");
-inline static const muse::rcommand::Command TOGGLE_NOTE_INPUT_TIMEWISE_COMMAND("command://notation/toggle-note-input-timewise");
-inline static const muse::rcommand::Command TOGGLE_INSERT_MODE_COMMAND("command://notation/toggle-insert-mode");
+
 inline static const muse::rcommand::Command REALTIME_ADVANCE_COMMAND("command://notation/realtime-advance");
 
-inline static const muse::rcommand::Command SET_DURATION_LONGA_COMMAND("command://notation/set-duration-longa");
-inline static const muse::rcommand::Command SET_DURATION_BREVE_COMMAND("command://notation/set-duration-breve");
-inline static const muse::rcommand::Command SET_DURATION_WHOLE_COMMAND("command://notation/set-duration-whole");
-inline static const muse::rcommand::Command SET_DURATION_HALF_COMMAND("command://notation/set-duration-half");
-inline static const muse::rcommand::Command SET_DURATION_QUARTER_COMMAND("command://notation/set-duration-quarter");
-inline static const muse::rcommand::Command SET_DURATION_EIGHTH_COMMAND("command://notation/set-duration-eighth");
-inline static const muse::rcommand::Command SET_DURATION_16TH_COMMAND("command://notation/set-duration-16th");
-inline static const muse::rcommand::Command SET_DURATION_32ND_COMMAND("command://notation/set-duration-32nd");
-inline static const muse::rcommand::Command SET_DURATION_64TH_COMMAND("command://notation/set-duration-64th");
-inline static const muse::rcommand::Command SET_DURATION_128TH_COMMAND("command://notation/set-duration-128th");
-inline static const muse::rcommand::Command SET_DURATION_256TH_COMMAND("command://notation/set-duration-256th");
-inline static const muse::rcommand::Command SET_DURATION_512TH_COMMAND("command://notation/set-duration-512th");
-inline static const muse::rcommand::Command SET_DURATION_1024TH_COMMAND("command://notation/set-duration-1024th");
-
-inline static const muse::rcommand::Command SET_DOUBLE_DURATION_COMMAND("command://notation/set-double-duration");
-inline static const muse::rcommand::Command SET_HALVE_DURATION_COMMAND("command://notation/set-halve-duration");
-inline static const muse::rcommand::Command SET_DOUBLE_DURATION_DOTTED_COMMAND("command://notation/set-double-duration-dotted");
-inline static const muse::rcommand::Command SET_HALVE_DURATION_DOTTED_COMMAND("command://notation/set-halve-duration-dotted");
-
 inline static const muse::rcommand::Command EXTEND_TO_NEXT_NOTE_COMMAND("command://notation/extend-to-next-note");
-
-inline static const muse::rcommand::Command TOGGLE_DOT_COMMAND("command://notation/toggle-dot");
-inline static const muse::rcommand::Command TOGGLE_DOT2_COMMAND("command://notation/toggle-dot2");
-inline static const muse::rcommand::Command TOGGLE_DOT3_COMMAND("command://notation/toggle-dot3");
-inline static const muse::rcommand::Command TOGGLE_DOT4_COMMAND("command://notation/toggle-dot4");
-
-inline static const muse::rcommand::Command TOGGLE_REST_COMMAND("command://notation/toggle-rest");
-
-inline static const muse::rcommand::Command TOGGLE_FLAT2_COMMAND("command://notation/toggle-flat2");
-inline static const muse::rcommand::Command TOGGLE_FLAT_COMMAND("command://notation/toggle-flat");
-inline static const muse::rcommand::Command TOGGLE_NAT_COMMAND("command://notation/toggle-nat");
-inline static const muse::rcommand::Command TOGGLE_SHARP_COMMAND("command://notation/toggle-sharp");
-inline static const muse::rcommand::Command TOGGLE_SHARP2_COMMAND("command://notation/toggle-sharp2");
-
-inline static const muse::rcommand::Command ADD_SHARP2_COMMAND("command://notation/add-sharp2");
-inline static const muse::rcommand::Command ADD_SHARP_COMMAND("command://notation/add-sharp");
-inline static const muse::rcommand::Command ADD_NAT_COMMAND("command://notation/add-nat");
-inline static const muse::rcommand::Command ADD_FLAT_COMMAND("command://notation/add-flat");
-inline static const muse::rcommand::Command ADD_FLAT2_COMMAND("command://notation/add-flat2");
 
 inline static const muse::rcommand::Command TOGGLE_TIE_COMMAND("command://notation/toggle-tie");
 inline static const muse::rcommand::Command ADD_SLUR_COMMAND("command://notation/add-slur");
@@ -505,28 +1066,6 @@ inline static const muse::rcommand::Command FLIP_HORIZONTALLY_COMMAND("command:/
 
 //inline static const muse::rcommand::Command ADD_NOTE_COMMAND("command://notation/add-note"); // with params
 inline static const muse::rcommand::Command ADD_DRUM_NOTE_COMMAND("command://notation/add-drum-note"); // with params
-
-inline static const muse::rcommand::Command ENTER_NOTE_C_COMMAND("command://notation/enter-note-c");
-inline static const muse::rcommand::Command ENTER_NOTE_D_COMMAND("command://notation/enter-note-d");
-inline static const muse::rcommand::Command ENTER_NOTE_E_COMMAND("command://notation/enter-note-e");
-inline static const muse::rcommand::Command ENTER_NOTE_F_COMMAND("command://notation/enter-note-f");
-inline static const muse::rcommand::Command ENTER_NOTE_G_COMMAND("command://notation/enter-note-g");
-inline static const muse::rcommand::Command ENTER_NOTE_A_COMMAND("command://notation/enter-note-a");
-inline static const muse::rcommand::Command ENTER_NOTE_B_COMMAND("command://notation/enter-note-b");
-inline static const muse::rcommand::Command ADD_NOTE_C_COMMAND("command://notation/add-note-c");
-inline static const muse::rcommand::Command ADD_NOTE_D_COMMAND("command://notation/add-note-d");
-inline static const muse::rcommand::Command ADD_NOTE_E_COMMAND("command://notation/add-note-e");
-inline static const muse::rcommand::Command ADD_NOTE_F_COMMAND("command://notation/add-note-f");
-inline static const muse::rcommand::Command ADD_NOTE_G_COMMAND("command://notation/add-note-g");
-inline static const muse::rcommand::Command ADD_NOTE_A_COMMAND("command://notation/add-note-a");
-inline static const muse::rcommand::Command ADD_NOTE_B_COMMAND("command://notation/add-note-b");
-inline static const muse::rcommand::Command INSERT_NOTE_C_COMMAND("command://notation/insert-note-c");
-inline static const muse::rcommand::Command INSERT_NOTE_D_COMMAND("command://notation/insert-note-d");
-inline static const muse::rcommand::Command INSERT_NOTE_E_COMMAND("command://notation/insert-note-e");
-inline static const muse::rcommand::Command INSERT_NOTE_F_COMMAND("command://notation/insert-note-f");
-inline static const muse::rcommand::Command INSERT_NOTE_G_COMMAND("command://notation/insert-note-g");
-inline static const muse::rcommand::Command INSERT_NOTE_A_COMMAND("command://notation/insert-note-a");
-inline static const muse::rcommand::Command INSERT_NOTE_B_COMMAND("command://notation/insert-note-b");
 
 inline static const muse::rcommand::Command ENTER_REST_COMMAND("command://notation/enter-rest");
 

@@ -51,7 +51,8 @@ struct NoteNameContract {
 struct NoteInputMethodContract {
     static constexpr std::string_view key = "method";
     static constexpr NoteInputMethod def = NoteInputMethod::BY_NOTE_NAME;
-    static constexpr EnumTable<NoteInputMethod, 7 > table { {
+    static constexpr EnumTable<NoteInputMethod, 8 > table { {
+        { "default", NoteInputMethod::DEFAULT, "default note input method" },
         { "by-note-name", NoteInputMethod::BY_NOTE_NAME, "input by note name" },
         { "by-duration", NoteInputMethod::BY_DURATION, "input by duration" },
         { "repitch", NoteInputMethod::REPITCH, "repitch" },
@@ -62,13 +63,44 @@ struct NoteInputMethodContract {
     } };
 };
 
+struct DurationTypeContract {
+    static constexpr std::string_view key = "duration";
+    static constexpr DurationType def = DurationType::V_QUARTER;
+    static constexpr EnumTable<DurationType, 13> table { {
+        { "longa", DurationType::V_LONG, "longa" },
+        { "breve", DurationType::V_BREVE, "breve" },
+        { "whole", DurationType::V_WHOLE, "whole" },
+        { "half", DurationType::V_HALF, "half" },
+        { "quarter", DurationType::V_QUARTER, "quarter" },
+        { "eighth", DurationType::V_EIGHTH, "eighth" },
+        { "16th", DurationType::V_16TH, "16th" },
+        { "32nd", DurationType::V_32ND, "32nd" },
+        { "64th", DurationType::V_64TH, "64th" },
+        { "128th", DurationType::V_128TH, "128th" },
+        { "256th", DurationType::V_256TH, "256th" },
+        { "512th", DurationType::V_512TH, "512th" },
+        { "1024th", DurationType::V_1024TH, "1024th" },
+    } };
+};
+
+struct ChangeDurationModeContract {
+    static constexpr std::string_view key = "mode";
+    static constexpr ChangeDurationMode def = ChangeDurationMode::Double;
+    static constexpr EnumTable<ChangeDurationMode, 4> table { {
+        { "double", ChangeDurationMode::Double, "double" },
+        { "halve", ChangeDurationMode::Halve, "halve" },
+        { "double-dotted", ChangeDurationMode::DoubleDotted, "double dotted" },
+        { "halve-dotted", ChangeDurationMode::HalveDotted, "halve dotted" },
+    } };
+};
+
 struct NoteAddingModeContract {
     static constexpr std::string_view key = "mode";
     static constexpr NoteAddingMode def = NoteAddingMode::CurrentChord;
     static constexpr EnumTable<NoteAddingMode, 3> table { {
-        { "current", NoteAddingMode::CurrentChord, "add to current chord" },
-        { "next", NoteAddingMode::NextChord, "add to next chord" },
-        { "insert", NoteAddingMode::InsertChord, "insert to chord" },
+        { "to-current-chord", NoteAddingMode::CurrentChord, "add to current chord" },
+        { "to-next-chord", NoteAddingMode::NextChord, "add to next chord" },
+        { "insert-to-chord", NoteAddingMode::InsertChord, "insert to chord" },
     } };
 };
 
@@ -151,15 +183,31 @@ struct PlayModeContract {
         { "chord", PlayMode::PlayChord, "play chord" },
     } };
 };
+
+struct AccidentalTypeContract {
+    static constexpr std::string_view key = "type";
+    static constexpr AccidentalType def = AccidentalType::NATURAL;
+    //! NOTE Only these types are used in the commands
+    static constexpr EnumTable<AccidentalType, 5> table { {
+        { "flat2", AccidentalType::FLAT2, "double flat" },
+        { "flat", AccidentalType::FLAT, "flat" },
+        { "natural", AccidentalType::NATURAL, "natural" },
+        { "sharp", AccidentalType::SHARP, "sharp" },
+        { "sharp2", AccidentalType::SHARP2, "double sharp" },
+    } };
+};
 }
 
 namespace muse::rcommand {
 DECLARE_ENUM_CONTRACT(mu::notation::NoteName, mu::notation::NoteNameContract);
 DECLARE_ENUM_CONTRACT(mu::notation::NoteInputMethod, mu::notation::NoteInputMethodContract);
+DECLARE_ENUM_CONTRACT(mu::engraving::DurationType, mu::notation::DurationTypeContract);
+DECLARE_ENUM_CONTRACT(mu::notation::ChangeDurationMode, mu::notation::ChangeDurationModeContract);
 DECLARE_ENUM_CONTRACT(mu::notation::NoteAddingMode, mu::notation::NoteAddingModeContract);
 DECLARE_ENUM_CONTRACT(mu::engraving::TupletNumberType, mu::notation::TupletNumberTypeContract);
 DECLARE_ENUM_CONTRACT(mu::engraving::TupletBracketType, mu::notation::TupletBracketTypeContract);
 DECLARE_ENUM_CONTRACT(mu::engraving::TupletSelectedDuration, mu::notation::TupletSelectedDurationContract);
 DECLARE_ENUM_CONTRACT(mu::notation::SelectionTarget, mu::notation::SelectionTargetContract);
 DECLARE_ENUM_CONTRACT(mu::notation::PlayMode, mu::notation::PlayModeContract);
+DECLARE_ENUM_CONTRACT(mu::notation::AccidentalType, mu::notation::AccidentalTypeContract);
 }

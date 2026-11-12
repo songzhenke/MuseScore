@@ -586,23 +586,23 @@ MenuItemList AppMenuModel::makeRecentSubMenuItems()
 MenuItemList AppMenuModel::makeNotesItems()
 {
     MenuItemList items {
-        makeMenuItem(TOGGLE_NOTE_INPUT_COMMAND),
+        makeMenuItem(ToggleNoteInputDefaultCommand {}),
         makeSeparator(),
-        makeMenuItem(ENTER_NOTE_C_COMMAND),
-        makeMenuItem(ENTER_NOTE_D_COMMAND),
-        makeMenuItem(ENTER_NOTE_E_COMMAND),
-        makeMenuItem(ENTER_NOTE_F_COMMAND),
-        makeMenuItem(ENTER_NOTE_G_COMMAND),
-        makeMenuItem(ENTER_NOTE_A_COMMAND),
-        makeMenuItem(ENTER_NOTE_B_COMMAND),
+        makeMenuItem(AddNoteC_ToNextChordCommand::id),
+        makeMenuItem(AddNoteD_ToNextChordCommand::id),
+        makeMenuItem(AddNoteE_ToNextChordCommand::id),
+        makeMenuItem(AddNoteF_ToNextChordCommand::id),
+        makeMenuItem(AddNoteG_ToNextChordCommand::id),
+        makeMenuItem(AddNoteA_ToNextChordCommand::id),
+        makeMenuItem(AddNoteB_ToNextChordCommand::id),
         makeSeparator(),
-        makeMenuItem(ADD_NOTE_C_COMMAND),
-        makeMenuItem(ADD_NOTE_D_COMMAND),
-        makeMenuItem(ADD_NOTE_E_COMMAND),
-        makeMenuItem(ADD_NOTE_F_COMMAND),
-        makeMenuItem(ADD_NOTE_G_COMMAND),
-        makeMenuItem(ADD_NOTE_A_COMMAND),
-        makeMenuItem(ADD_NOTE_B_COMMAND),
+        makeMenuItem(AddNoteC_ToCurrentChordCommand::id),
+        makeMenuItem(AddNoteD_ToCurrentChordCommand::id),
+        makeMenuItem(AddNoteE_ToCurrentChordCommand::id),
+        makeMenuItem(AddNoteF_ToCurrentChordCommand::id),
+        makeMenuItem(AddNoteG_ToCurrentChordCommand::id),
+        makeMenuItem(AddNoteA_ToCurrentChordCommand::id),
+        makeMenuItem(AddNoteB_ToCurrentChordCommand::id),
     };
 
     return items;

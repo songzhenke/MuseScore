@@ -136,30 +136,42 @@ private:
 
     mu::engraving::Score* currentNotationScore() const;
 
-    muse::Ret select(const SelectTargetCommand& command);
+    muse::Ret select(const SelectCommand& command);
     muse::Ret select(SelectionTarget target, PlayMode playMode = PlayMode::NoPlay);
-    muse::Ret addToSelection(const AddToSelectionTargetCommand& command);
+    muse::Ret addToSelection(const AddToSelectionCommand& command);
     muse::Ret addToSelection(SelectionTarget target);
+    muse::Ret openSelectionMoreOptions();
+    muse::Ret showLocation();
 
-    void toggleNoteInput(NoteInputMethod method);
-    void toggleNoteInputInsert();
-    muse::RetVal<GetNoteInputStateCommand::Output> getNoteInputState() const;
+    muse::Ret toggleNoteInput(const ToggleNoteInputCommand& command);
+    muse::Ret toggleNoteInput(NoteInputMethod method);
+    muse::Ret toggleNoteInputInsert();
+
+    muse::Ret setDuration(const SetDurationCommand& command);
+    muse::Ret setDuration(engraving::DurationType duration);
+    muse::Ret changeDuration(const ChangeDurationCommand& command);
+    muse::Ret changeDuration(ChangeDurationMode mode);
+    muse::Ret toggleDots(const ToggleDotsCommand& command);
+    muse::Ret toggleDots(uint dots);
+
+    muse::Ret toggleRest();
+
+    muse::RetVal<RequestNoteInputStateCommand::Output> requestNoteInputState() const;
+
+    muse::Ret addNote(const AddNoteCommand& command);
+    muse::Ret addNote(NoteName noteName, NoteAddingMode addingMode);
+    muse::Ret addDrumNote(const muse::rcommand::Params& params);
+    void doAddNote(const NoteInputParams& params, const NoteAddingMode& addingMode);
+
+    muse::Ret toggleAccidental(const ToggleAccidentalCommand& command);
 
     muse::Ret flipSelection();
 
-    muse::Ret addNote(const AddNoteCommand& command);
-    void addNote(NoteName noteName, NoteAddingMode addingMode);
-    muse::Ret addDrumNote(const muse::rcommand::Params& params);
-    void doAddNote(const NoteInputParams& params, const NoteAddingMode& addingMode);
-    void setDuration(engraving::DurationType duration);
-    void toggleRest();
-    void toggleDots(int dots);
     muse::Ret putNote(const muse::rcommand::Params& params);
     muse::Ret removeNote(const muse::rcommand::Params& params);
-    void increaseDecreaseDuration(int steps, bool stepByDots);
+
     void realtimeAdvance();
 
-    void toggleAccidental(engraving::AccidentalType type);
     void toggleArticulation(SymbolId articulationSymbolId);
 
     muse::Ret putTuplet(const muse::rcommand::Params& params);
@@ -190,8 +202,6 @@ private:
     void addFiguredBass();
     void addGuitarBend(GuitarBendType bendType);
     void addFretboardDiagram();
-
-    void openSelectionMoreOptions();
 
     muse::Ret startEditSelectedElement(const muse::rcommand::Params& params);
     muse::Ret startEditSelectedText(const muse::rcommand::Params& params);
@@ -283,9 +293,9 @@ private:
     template<muse::rcommand::TypedCommand C>
     void registerCommand(muse::Ret (NotationActionController::*)(const C&));
     template<muse::rcommand::HasOutput C>
-    void registerGetCommand(muse::RetVal<typename C::Output>(NotationActionController::*)() const);
+    void registerRequestCommand(muse::RetVal<typename C::Output>(NotationActionController::*)() const);
     template<muse::rcommand::HasOutput C>
-    void registerGetCommand(muse::RetVal<typename C::Output>(NotationActionController::*)(const C&) const);
+    void registerRequestCommand(muse::RetVal<typename C::Output>(NotationActionController::*)(const C&) const);
 
     void registerCommand(const muse::rcommand::Command&, std::function<void()>);
     void registerCommand(const muse::rcommand::Command&, std::function<void()>, bool (NotationActionController::*)() const);
@@ -299,8 +309,6 @@ private:
     template<typename P1>
     void registerCommand(const muse::rcommand::Command&, void (INotationInteraction::*)(P1), P1, PlayMode = PlayMode::NoPlay,
                          bool (NotationActionController::*)() const = nullptr);
-    void registerNoteInputCommand(const muse::rcommand::Command& command, NoteInputMethod method);
-    void registerNoteCommand(const muse::rcommand::Command&, NoteName, NoteAddingMode addingMode = NoteAddingMode::NextChord);
     void registerNavigationByFractionCommand(const muse::rcommand::Command&, const Fraction&);
 
     void registerGetCommand(const muse::rcommand::Command&, std::function<muse::RetVal<muse::rcommand::Params>()>);

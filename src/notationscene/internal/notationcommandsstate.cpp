@@ -61,11 +61,12 @@ static const std::vector<Command> HAS_SELECTION_REQUIRED_COMMANDS = {
     SelectSimilarInStaffCommand::id,
     SelectSimilarInRangeCommand::id,
     SelectNotesInChordCommand::id,
-    OPEN_SELECTION_OPTIONS_COMMAND,
-    SET_DOUBLE_DURATION_COMMAND,
-    SET_HALVE_DURATION_COMMAND,
-    SET_DOUBLE_DURATION_DOTTED_COMMAND,
-    SET_HALVE_DURATION_DOTTED_COMMAND,
+    OpenSelectionOptionsCommand::id,
+    ChangeDurationCommand::id,
+    ChangeDurationDoubleCommand::id,
+    ChangeDurationHalveCommand::id,
+    ChangeDurationDoubleDottedCommand::id,
+    ChangeDurationHalveDottedCommand::id,
     TOGGLE_SNAP_TO_PREV_COMMAND,
     TOGGLE_SNAP_TO_NEXT_COMMAND,
     MIRROR_NOTEHEAD_COMMAND,
@@ -115,46 +116,59 @@ static const std::vector<Command> NOT_TEXT_EDITING_COMMANDS = {
     TOGGLE_MMREST_COMMAND,
 };
 
-static const std::map<Command, NoteInputMethod> NOTE_INPUT_COMMANDS = {
-    { TOGGLE_NOTE_INPUT_COMMAND, NoteInputMethod::UNKNOWN },
-    { TOGGLE_NOTE_INPUT_BY_NOTE_NAME_COMMAND, NoteInputMethod::BY_NOTE_NAME },
-    { TOGGLE_NOTE_INPUT_BY_DURATION_COMMAND, NoteInputMethod::BY_DURATION },
-    { TOGGLE_NOTE_INPUT_RHYTHM_COMMAND, NoteInputMethod::RHYTHM },
-    { TOGGLE_NOTE_INPUT_REPITCH_COMMAND, NoteInputMethod::REPITCH },
-    { TOGGLE_NOTE_INPUT_REALTIME_AUTO_COMMAND, NoteInputMethod::REALTIME_AUTO },
-    { TOGGLE_NOTE_INPUT_REALTIME_MANUAL_COMMAND, NoteInputMethod::REALTIME_MANUAL },
-    { TOGGLE_NOTE_INPUT_TIMEWISE_COMMAND, NoteInputMethod::TIMEWISE }
+static const std::vector<Command> NOTE_INPUT_COMMANDS = {
+    ToggleNoteInputCommand::id,
+    ToggleNoteInputDefaultCommand::id,
+    ToggleNoteInputByNameCommand::id,
+    ToggleNoteInputByDurationCommand::id,
+    ToggleNoteInputRhythmCommand::id,
+    ToggleNoteInputRepitchCommand::id,
+    ToggleNoteInputRealtimeAutoCommand::id,
+    ToggleNoteInputRealtimeManualCommand::id,
+    ToggleNoteInputTimewiseCommand::id,
+    ToggleInsertModeCommand::id
+};
+
+static const std::map<Command, NoteInputMethod> NOTE_INPUT_METHODS = {
+    { ToggleNoteInputDefaultCommand::id, NoteInputMethod::DEFAULT },
+    { ToggleNoteInputByNameCommand::id, NoteInputMethod::BY_NOTE_NAME },
+    { ToggleNoteInputByDurationCommand::id, NoteInputMethod::BY_DURATION },
+    { ToggleNoteInputRhythmCommand::id, NoteInputMethod::RHYTHM },
+    { ToggleNoteInputRepitchCommand::id, NoteInputMethod::REPITCH },
+    { ToggleNoteInputRealtimeAutoCommand::id, NoteInputMethod::REALTIME_AUTO },
+    { ToggleNoteInputRealtimeManualCommand::id, NoteInputMethod::REALTIME_MANUAL },
+    { ToggleNoteInputTimewiseCommand::id, NoteInputMethod::TIMEWISE }
 };
 
 static const std::map<Command, DurationType> DURATION_COMMANDS = {
-    { SET_DURATION_LONGA_COMMAND, DurationType::V_LONG },
-    { SET_DURATION_BREVE_COMMAND, DurationType::V_BREVE },
-    { SET_DURATION_WHOLE_COMMAND, DurationType::V_WHOLE },
-    { SET_DURATION_HALF_COMMAND, DurationType::V_HALF },
-    { SET_DURATION_QUARTER_COMMAND, DurationType::V_QUARTER },
-    { SET_DURATION_EIGHTH_COMMAND, DurationType::V_EIGHTH },
-    { SET_DURATION_16TH_COMMAND, DurationType::V_16TH },
-    { SET_DURATION_32ND_COMMAND, DurationType::V_32ND },
-    { SET_DURATION_64TH_COMMAND, DurationType::V_64TH },
-    { SET_DURATION_128TH_COMMAND, DurationType::V_128TH },
-    { SET_DURATION_256TH_COMMAND, DurationType::V_256TH },
-    { SET_DURATION_512TH_COMMAND, DurationType::V_512TH },
-    { SET_DURATION_1024TH_COMMAND, DurationType::V_1024TH }
+    { SetDurationLongaCommand::id, DurationType::V_LONG },
+    { SetDurationBreveCommand::id, DurationType::V_BREVE },
+    { SetDurationWholeCommand::id, DurationType::V_WHOLE },
+    { SetDurationHalfCommand::id, DurationType::V_HALF },
+    { SetDurationQuarterCommand::id, DurationType::V_QUARTER },
+    { SetDurationEighthCommand::id, DurationType::V_EIGHTH },
+    { SetDuration16thCommand::id, DurationType::V_16TH },
+    { SetDuration32ndCommand::id, DurationType::V_32ND },
+    { SetDuration64thCommand::id, DurationType::V_64TH },
+    { SetDuration128thCommand::id, DurationType::V_128TH },
+    { SetDuration256thCommand::id, DurationType::V_256TH },
+    { SetDuration512thCommand::id, DurationType::V_512TH },
+    { SetDuration1024thCommand::id, DurationType::V_1024TH }
 };
 
 static const std::map<Command, int> DOT_COUNT_COMMANDS = {
-    { TOGGLE_DOT_COMMAND, 1 },
-    { TOGGLE_DOT2_COMMAND, 2 },
-    { TOGGLE_DOT3_COMMAND, 3 },
-    { TOGGLE_DOT4_COMMAND, 4 }
+    { ToggleDotCommand::id, 1 },
+    { ToggleDot2Command::id, 2 },
+    { ToggleDot3Command::id, 3 },
+    { ToggleDot4Command::id, 4 }
 };
 
 static const std::map<Command, AccidentalType> ACCIDENTAL_COMMANDS = {
-    { TOGGLE_FLAT2_COMMAND, AccidentalType::FLAT2 },
-    { TOGGLE_FLAT_COMMAND, AccidentalType::FLAT },
-    { TOGGLE_NAT_COMMAND, AccidentalType::NATURAL },
-    { TOGGLE_SHARP_COMMAND, AccidentalType::SHARP },
-    { TOGGLE_SHARP2_COMMAND, AccidentalType::SHARP2 }
+    { ToggleFlat2Command::id, AccidentalType::FLAT2 },
+    { ToggleFlatCommand::id, AccidentalType::FLAT },
+    { ToggleNaturalCommand::id, AccidentalType::NATURAL },
+    { ToggleSharpCommand::id, AccidentalType::SHARP },
+    { ToggleSharp2Command::id, AccidentalType::SHARP2 }
 };
 
 static const std::vector<Command> ADD_COMMANDS = {
@@ -179,28 +193,28 @@ static const std::map<Command, voice_idx_t> VOICE_COMMANDS = {
 
 static const std::vector<Command> NOTE_COMMANDS = {
     AddNoteCommand::id,
-    ENTER_NOTE_C_COMMAND,
-    ENTER_NOTE_D_COMMAND,
-    ENTER_NOTE_E_COMMAND,
-    ENTER_NOTE_F_COMMAND,
-    ENTER_NOTE_G_COMMAND,
-    ENTER_NOTE_A_COMMAND,
-    ENTER_NOTE_B_COMMAND,
+    AddNoteC_ToNextChordCommand::id,
+    AddNoteD_ToNextChordCommand::id,
+    AddNoteE_ToNextChordCommand::id,
+    AddNoteF_ToNextChordCommand::id,
+    AddNoteG_ToNextChordCommand::id,
+    AddNoteA_ToNextChordCommand::id,
+    AddNoteB_ToNextChordCommand::id,
     ENTER_REST_COMMAND,
-    ADD_NOTE_C_COMMAND,
-    ADD_NOTE_D_COMMAND,
-    ADD_NOTE_E_COMMAND,
-    ADD_NOTE_F_COMMAND,
-    ADD_NOTE_G_COMMAND,
-    ADD_NOTE_A_COMMAND,
-    ADD_NOTE_B_COMMAND,
-    INSERT_NOTE_C_COMMAND,
-    INSERT_NOTE_D_COMMAND,
-    INSERT_NOTE_E_COMMAND,
-    INSERT_NOTE_F_COMMAND,
-    INSERT_NOTE_G_COMMAND,
-    INSERT_NOTE_A_COMMAND,
-    INSERT_NOTE_B_COMMAND
+    AddNoteC_ToCurrentChordCommand::id,
+    AddNoteD_ToCurrentChordCommand::id,
+    AddNoteE_ToCurrentChordCommand::id,
+    AddNoteF_ToCurrentChordCommand::id,
+    AddNoteG_ToCurrentChordCommand::id,
+    AddNoteA_ToCurrentChordCommand::id,
+    AddNoteB_ToCurrentChordCommand::id,
+    AddNoteC_ToInsertChordCommand::id,
+    AddNoteD_ToInsertChordCommand::id,
+    AddNoteE_ToInsertChordCommand::id,
+    AddNoteF_ToInsertChordCommand::id,
+    AddNoteG_ToInsertChordCommand::id,
+    AddNoteA_ToInsertChordCommand::id,
+    AddNoteB_ToInsertChordCommand::id
 };
 
 static const std::vector<Command> TUPLET_COMMANDS = {
@@ -326,7 +340,7 @@ void NotationCommandsState::init()
     controller()->selectionChanged().onNotify(this, [this]() {
         updateCommandStates(HAS_SELECTION_REQUIRED_COMMANDS);
         updateCommandStates(ADD_COMMANDS);
-        updateCommandStates({ TOGGLE_REST_COMMAND });
+        updateCommandStates({ ToggleRestCommand::id });
         updateCommandStates(commands(VOICE_COMMANDS));
         updateCommandStates(NOTE_OR_REST_SELECTED_COMMANDS);
         updateCommandStates(TUPLET_COMMANDS);
@@ -347,14 +361,14 @@ void NotationCommandsState::init()
     });
 
     controller()->isNoteInputAllowedChanged().onReceive(this, [this](bool) {
-        updateCommandStates(commands(NOTE_INPUT_COMMANDS));
+        updateCommandStates(NOTE_INPUT_COMMANDS);
     });
 
     controller()->noteInputStateChanged().onNotify(this, [this]() {
-        updateCommandStates(commands(NOTE_INPUT_COMMANDS));
+        updateCommandStates(NOTE_INPUT_COMMANDS);
         updateCommandStates(commands(DURATION_COMMANDS));
         updateCommandStates(commands(DOT_COUNT_COMMANDS));
-        updateCommandStates({ TOGGLE_REST_COMMAND });
+        updateCommandStates({ ToggleRestCommand::id });
         updateCommandStates(commands(ACCIDENTAL_COMMANDS));
         updateCommandStates({ REALTIME_ADVANCE_COMMAND });
         updateCommandStates(ADD_COMMANDS);
@@ -457,10 +471,13 @@ CommandState NotationCommandsState::doCommandState(const Command& command) const
     }
 
     if (muse::contains(NOTE_INPUT_COMMANDS, command)) {
-        return CommandState(controller()->isNoteInputAllowed(),
-                            controller()->isNoteInputMode() && controller()->noteInputMethod() == NOTE_INPUT_COMMANDS.at(command));
-    } else if (command == REALTIME_ADVANCE_COMMAND) {
-        return CommandState(controller()->isNoteInputMode(), false);
+        if (muse::contains(NOTE_INPUT_METHODS, command)) {
+            return CommandState(controller()->isNoteInputAllowed(),
+                                controller()->isNoteInputMode()
+                                && controller()->noteInputMethod() == NOTE_INPUT_METHODS.at(command));
+        } else {
+            return CommandState(controller()->isNoteInputAllowed(), false);
+        }
     }
 
     if (muse::contains(DURATION_COMMANDS, command)) {
@@ -471,7 +488,7 @@ CommandState NotationCommandsState::doCommandState(const Command& command) const
         return CommandState(true, controller()->currentDotCount() == DOT_COUNT_COMMANDS.at(command));
     }
 
-    if (command == TOGGLE_REST_COMMAND) {
+    if (command == ToggleRestCommand::id) {
         return CommandState(true, controller()->currentIsRest());
     }
 

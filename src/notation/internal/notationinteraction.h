@@ -344,7 +344,7 @@ public:
     void changeAccidental(mu::engraving::AccidentalType) override;
     void transposeSemitone(int) override;
     void transposeDiatonicAlterations(mu::engraving::TransposeDirection) override;
-    void getLocation() override;
+    void showLocation() override;
     void execute(void (mu::engraving::Score::*)(), const muse::TranslatableString& actionName) override;
 
     void showItem(const mu::engraving::EngravingItem* item, int staffIndex = -1) override;
@@ -479,8 +479,11 @@ private:
 
     void applyLineNoteToNote(engraving::Score* score, Note* note1, Note* note2, EngravingItem* line);
 
-    void doAddSlur(const mu::engraving::Slur* slurTemplate = nullptr);
-    void doAddSlur(EngravingItem* firstItem, EngravingItem* secondItem, const mu::engraving::Slur* slurTemplate);
+    void doAddSlur(mu::engraving::Transaction& tx, const mu::engraving::Slur* slurTemplate = nullptr);
+    void doAddSlur(mu::engraving::Transaction& tx, EngravingItem* firstItem, EngravingItem* secondItem,
+                   const mu::engraving::Slur* slurTemplate);
+    void endEditSlurToReplace(const mu::engraving::Slur* slurTemplate);
+    void selectAddedSlur(mu::engraving::Slur* slur, bool replacedSlur, bool toNextChord);
 
     void doAutoFlipHairpinsType(mu::engraving::Dynamic* dynamic);
 
