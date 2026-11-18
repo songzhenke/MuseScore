@@ -93,3 +93,5 @@ See the [Unit tests section](https://github.com/musescore/MuseScore/wiki/Unit-te
 Run `./hooks/install.sh` to install a pre-commit hook that will format your staged files. Requires that you install `uncrustify`.
 
 If you have problems, please report them. To uninstall, run `./hooks/uninstall.sh`.
+
+
